@@ -15,8 +15,8 @@ export function ResourceBar() {
 
   return (
     <div className="hud-panel resources">
-      <span title={t.tokensOut}>🪙 {formatK(totals.output)}</span>
-      <span title={t.tokensIn} style={{ opacity: 0.7 }}>
+      <span className="px" title={t.tokensOut}>🪙 {formatK(totals.output)}</span>
+      <span className="px" title={t.tokensIn} style={{ opacity: 0.7 }}>
         📜 {formatK(totals.input)}
       </span>
       <span style={{ opacity: 0.7 }}>{connected ? '●' : t.connecting}</span>

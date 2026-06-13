@@ -4,6 +4,7 @@ import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
 import { clip, formatK } from '../util';
+import { StatTile } from './StatTile';
 
 const EMPTY: BuildingWindowStats = { today: 0, week: 0, month: 0 };
 
@@ -58,7 +59,7 @@ export function BuildingPanel() {
     <div className="hud-panel sidepanel" style={{ overflowY: 'auto' }}>
       <div className="head">
         <div>
-          <strong>{bt.label}</strong>
+          <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{bt.label}</strong>
           <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>{bt.desc}</div>
           <div style={{ fontSize: 11, opacity: 0.65, marginTop: 4 }}>
             {t.workingNow}: <b>{workingNow}</b>
@@ -86,24 +87,17 @@ export function BuildingPanel() {
       )}
 
       <div style={{ borderTop: '1px solid #33332f', paddingTop: 8 }}>
-        <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.7, marginBottom: 6 }}>
+        <div className="px" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.7, marginBottom: 6 }}>
           {t.tokenUsage}
           {loading ? ' …' : ''}
         </div>
-        <Row label={t.today} value={win.today} />
-        <Row label={t.week} value={win.week} />
-        <Row label={t.month} value={win.month} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+          <StatTile label={t.today} value={formatK(win.today)} />
+          <StatTile label={t.week} value={formatK(win.week)} />
+          <StatTile label={t.month} value={formatK(win.month)} />
+        </div>
         <div style={{ fontSize: 10, opacity: 0.5, marginTop: 6 }}>{t.attribution}</div>
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: number }) {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', fontSize: 13 }}>
-      <span style={{ opacity: 0.8 }}>{label}</span>
-      <b>{formatK(value)}</b>
     </div>
   );
 }

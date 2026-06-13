@@ -5,6 +5,7 @@ import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
 import { TEAM_COLORS } from '../game/placeholders';
 import { clip, formatK } from '../util';
+import { StatTile } from './StatTile';
 
 // Stała referencja — selektor zwracający świeże [] przy każdym wywołaniu
 // wprawiłby useSyncExternalStore w nieskończoną pętlę renderów.
@@ -94,7 +95,7 @@ export function SidePanel() {
         <div style={{ display: 'flex', gap: 8, minWidth: 0 }}>
           <span style={{ width: 12, height: 12, borderRadius: '50%', background: hexColor(hero.teamColor), marginTop: 4, flex: 'none' }} />
           <div style={{ minWidth: 0 }}>
-            <strong>{hero.title}</strong>
+            <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{hero.title}</strong>
             <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
               {hero.model ?? t.modelUnknown}
               {hero.gitBranch ? ` · ⎇ ${hero.gitBranch}` : ''}
@@ -113,7 +114,7 @@ export function SidePanel() {
           alignItems: 'center',
           gap: 8,
           background: `${st.color}29`,
-          borderLeft: `3px solid ${st.color}`,
+          boxShadow: `inset 2px 0 0 ${st.color}, inset 0 0 0 1px #00000022`,
           padding: '8px 10px',
           fontSize: 13,
         }}
@@ -127,10 +128,10 @@ export function SidePanel() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-        <Vital label={t.produced} value={formatK(hero.tokens.output)} />
-        <Vital label={t.read} value={formatK(hero.tokens.input)} />
-        <Vital label={t.active} value={fmtDuration(hero.startedAt, now)} />
-        <Vital label={t.peons} value={String(helpers)} />
+        <StatTile label={t.produced} value={formatK(hero.tokens.output)} />
+        <StatTile label={t.read} value={formatK(hero.tokens.input)} />
+        <StatTile label={t.active} value={fmtDuration(hero.startedAt, now)} />
+        <StatTile label={t.peons} value={String(helpers)} />
       </div>
 
       {mission && (
@@ -173,18 +174,9 @@ export function SidePanel() {
   );
 }
 
-function Vital({ label, value }: { label: string; value: string }) {
-  return (
-    <div style={{ background: '#2a2926', borderRadius: 6, padding: '7px 9px' }}>
-      <div style={{ fontSize: 11, opacity: 0.55 }}>{label}</div>
-      <div style={{ fontSize: 15, fontWeight: 500 }}>{value}</div>
-    </div>
-  );
-}
-
 function Label({ text }: { text: string }) {
   return (
-    <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.5, marginBottom: 5 }}>
+    <div className="px" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.55, marginBottom: 5 }}>
       {text}
     </div>
   );

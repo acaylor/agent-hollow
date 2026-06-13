@@ -1,10 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500&display=swap');
+
+/* Chrome panelu w stylu pixel-art RTS (Wariant B): ostre rogi, ramka 3D z bevelem,
+   nity w narożnikach, ciemny kontur. Wspólne dla WSZYSTKICH paneli HUD. */
 .hud-panel {
   position: absolute;
-  background: rgba(26, 26, 23, 0.88);
-  border: 1px solid #444441;
-  border-radius: 8px;
+  background-color: #1f1e1b;
+  background-image: linear-gradient(#8a8780, #8a8780), linear-gradient(#8a8780, #8a8780),
+    linear-gradient(#8a8780, #8a8780), linear-gradient(#8a8780, #8a8780);
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+  background-position: 4px 4px, calc(100% - 4px) 4px, 4px calc(100% - 4px), calc(100% - 4px) calc(100% - 4px);
+  border: 3px solid #3a3a36;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px #6b6a63, 0 0 0 2px #15140f;
   color: #f1efe8;
   font-size: 13px;
+  image-rendering: pixelated;
+}
+
+/* Pixel font — TYLKO tytuły/etykiety/liczby (gęsty tekst zostaje czytelny). */
+.px {
+  font-family: 'Pixelify Sans', system-ui, sans-serif;
+}
+
+/* Beveled kafelek statystyki (ostre rogi, światło lewa-góra / cień prawy-dół). */
+.stat-tile {
+  background: #2a2926;
+  box-shadow: inset 1px 1px 0 #45443f, inset -1px -1px 0 #15140f;
+  padding: 7px 9px;
 }
 
 .portraits {

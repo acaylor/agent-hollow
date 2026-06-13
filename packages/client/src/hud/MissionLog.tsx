@@ -28,7 +28,7 @@ export function MissionLog() {
 
   return (
     <div className="hud-panel missions">
-      <h3>{t.missions}</h3>
+      <h3 className="px" style={{ color: '#fac775', opacity: 0.9 }}>{t.missions}</h3>
       {[...active, ...done].map((mission) => (
         <div key={mission.id} className="mission">
           <div>
