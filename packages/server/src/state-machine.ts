@@ -1,5 +1,5 @@
 import { basename } from 'node:path';
-import type { HeroSnapshot, HeroStateKind } from '@agent-citadel/shared';
+import type { ActionEntry, HeroSnapshot, HeroStateKind } from '@agent-citadel/shared';
 import type { Fact } from './transcript/facts.js';
 import { cleanTitle, isSubstantialPrompt } from './transcript/title.js';
 import type { World } from './world.js';
@@ -46,6 +46,9 @@ export class SessionTracker {
   private explicitTitle?: string; // jawny tytuł z CLI (custom-title/ai-title), jeśli wersja Claude go zapisze
   private firstSubstantialPrompt?: string; // pierwszy SENSOWNY prompt (nie "ok"/"dawaj") — stabilna nazwa
   private projectName?: string; // basename cwd, np. "RTS agents"
+  private recentActions: ActionEntry[] = []; // ostatnie narzędzia, najnowsze pierwsze (oś aktywności w panelu)
+
+  private static readonly MAX_RECENT_ACTIONS = 5;
 
   constructor(
     private readonly world: World,
@@ -66,6 +69,7 @@ export class SessionTracker {
       teamColor: this.world.claimTeamColor(),
       state: 'idle',
       tokens: this.tokens,
+      recentActions: this.recentActions,
       startedAt: now,
       lastActivityAt: now,
     };
@@ -140,13 +144,19 @@ export class SessionTracker {
         });
         break;
 
-      case 'tool-start':
-        if (fact.tool === 'AskUserQuestion' || fact.tool === 'ExitPlanMode') {
-          this.patch({ state: 'awaiting-input', currentTool: fact.tool, toolDetail: fact.detail }, fact.ts);
-        } else {
-          this.patch({ state: 'working', currentTool: fact.tool, toolDetail: fact.detail }, fact.ts);
-        }
+      case 'tool-start': {
+        // Oś aktywności: dorzuć narzędzie na początek bufora (najnowsze pierwsze), przytnij.
+        this.recentActions = [{ tool: fact.tool, detail: fact.detail, ts: fact.ts }, ...this.recentActions].slice(
+          0,
+          SessionTracker.MAX_RECENT_ACTIONS,
+        );
+        const awaiting = fact.tool === 'AskUserQuestion' || fact.tool === 'ExitPlanMode';
+        this.patch(
+          { state: awaiting ? 'awaiting-input' : 'working', currentTool: fact.tool, toolDetail: fact.detail, recentActions: this.recentActions },
+          fact.ts,
+        );
         break;
+      }
 
       case 'usage':
         if (!this.seenUsage.has(fact.messageId)) {

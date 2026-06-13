@@ -9,6 +9,15 @@ export type HeroStateKind =
   | 'error'
   | 'returning';
 
+/** Jedna „akcja" bohatera (użycie narzędzia) — do osi „ostatnie akcje" w panelu. */
+export interface ActionEntry {
+  /** Nazwa narzędzia, np. 'Edit', 'Bash', 'mcp__slack__send'. */
+  tool: string;
+  /** Krótki opis (plik, komenda, query) — jak toolDetail. */
+  detail?: string;
+  ts: string;
+}
+
 export interface HeroSnapshot {
   sessionId: string;
   title: string;
@@ -26,6 +35,8 @@ export interface HeroSnapshot {
   /** Krótki opis do dymka nad jednostką (np. Bash.description). */
   toolDetail?: string;
   tokens: { input: number; output: number };
+  /** Ostatnie użyte narzędzia (najnowsze pierwsze, max kilka) — oś aktywności w panelu. */
+  recentActions?: ActionEntry[];
   startedAt: string;
   lastActivityAt: string;
 }

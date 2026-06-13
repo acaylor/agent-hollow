@@ -1,6 +1,7 @@
 import type { HeroSnapshot } from '@agent-citadel/shared';
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
+import { clip } from '../util';
 
 /** Linia meta misji: KTO + projekt + branch (bez powielania treści promptu). */
 function metaLine(hero: HeroSnapshot | undefined, sessionId: string): string {
@@ -39,8 +40,4 @@ export function MissionLog() {
       ))}
     </div>
   );
-}
-
-function clip(text: string, max: number): string {
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }

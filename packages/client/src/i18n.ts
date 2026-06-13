@@ -38,6 +38,12 @@ export interface UiStrings {
   zoomIn: string;
   zoomOut: string;
   zoomReset: string;
+  produced: string;
+  read: string;
+  active: string;
+  currentTask: string;
+  recentActions: string;
+  now: string;
 }
 
 const EN: UiStrings = {
@@ -78,6 +84,12 @@ const EN: UiStrings = {
   zoomIn: 'Zoom in',
   zoomOut: 'Zoom out',
   zoomReset: 'Reset view',
+  produced: 'Produced',
+  read: 'Read',
+  active: 'Active',
+  currentTask: 'Current task',
+  recentActions: 'Recent actions',
+  now: 'now',
 };
 
 const PL: UiStrings = {
@@ -118,6 +130,12 @@ const PL: UiStrings = {
   zoomIn: 'Przybliż',
   zoomOut: 'Oddal',
   zoomReset: 'Wycentruj',
+  produced: 'Wytworzono',
+  read: 'Przeczytano',
+  active: 'Aktywny',
+  currentTask: 'Bieżące zadanie',
+  recentActions: 'Ostatnie akcje',
+  now: 'teraz',
 };
 
 const UI: Record<Lang, UiStrings> = { en: EN, pl: PL };

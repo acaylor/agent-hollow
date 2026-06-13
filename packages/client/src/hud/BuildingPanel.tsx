@@ -3,6 +3,7 @@ import { toolToBuilding, type BuildingId, type BuildingStatsResponse, type Build
 import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
+import { clip, formatK } from '../util';
 
 const EMPTY: BuildingWindowStats = { today: 0, week: 0, month: 0 };
 
@@ -107,12 +108,3 @@ function Row({ label, value }: { label: string; value: number }) {
   );
 }
 
-function clip(text: string, max: number): string {
-  return text.length > max ? `${text.slice(0, max - 1)}…` : text;
-}
-
-function formatK(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `${Math.round(value / 1_000)}k`;
-  return String(value);
-}

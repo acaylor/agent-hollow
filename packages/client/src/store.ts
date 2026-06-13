@@ -76,3 +76,9 @@ export const useWorld = create<WorldStore>((set) => ({
       }
     }),
 }));
+
+// Dev-only uchwyt do debugowania żywego świata z konsoli (np. wstrzyknięcie
+// snapshotu, inspekcja heroes/peons). Nie trafia do builda produkcyjnego.
+if ((import.meta as { env?: { DEV?: boolean } }).env?.DEV) {
+  (globalThis as Record<string, unknown>).__world = useWorld;
+}

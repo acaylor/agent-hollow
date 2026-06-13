@@ -1,5 +1,6 @@
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
+import { formatK } from '../util';
 
 /** Pasek zasobów: suma tokenów wszystkich bohaterów = "złoto" twierdzy. */
 export function ResourceBar() {
@@ -21,10 +22,4 @@ export function ResourceBar() {
       <span style={{ opacity: 0.7 }}>{connected ? '●' : t.connecting}</span>
     </div>
   );
-}
-
-function formatK(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-  if (value >= 1_000) return `${Math.round(value / 1_000)}k`;
-  return String(value);
 }

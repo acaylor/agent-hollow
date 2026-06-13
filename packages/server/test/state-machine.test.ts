@@ -76,6 +76,18 @@ describe('SessionTracker', () => {
     expect(world.getHero('sesja-1')?.title).toBe('Dodaj logowanie');
   });
 
+  it('recentActions zbiera ostatnie narzędzia (najnowsze pierwsze, max 5)', () => {
+    const { world, tracker } = setup();
+    for (let i = 1; i <= 6; i++) {
+      tracker.apply({ kind: 'tool-start', tool: i % 2 ? 'Edit' : 'Bash', detail: `plik${i}`, messageId: `m${i}`, ts: `2026-06-13T10:00:0${i}.000Z` });
+    }
+    const ra = world.getHero('sesja-1')?.recentActions ?? [];
+    expect(ra.length).toBe(5); // przycięte do 5
+    expect(ra[0].detail).toBe('plik6'); // najnowsze pierwsze
+    expect(ra[0].tool).toBe('Bash');
+    expect(ra[4].detail).toBe('plik2'); // najstarsze zachowane (plik1 wypadł)
+  });
+
   it('czyści markery markdown w nazwie', () => {
     const { world, tracker } = setup();
     tracker.apply({ kind: 'prompt', text: '# Zadanie: Napraw zoom mapy', ts: '2026-06-13T10:00:00.000Z' });
