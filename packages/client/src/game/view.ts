@@ -12,6 +12,7 @@ import { sessionToArchetypeKey } from './archetype';
 import { loadTilemaps, hasTilemaps, buildTilemap } from './tilemap';
 import { loadBuildingSprites } from './building-sprites';
 import { loadDecorationSprites, getDecorationTexture } from './decoration-sprites';
+import { loadIsoTiles, hasIsoTiles, buildIsoTilemap } from './tilemap-iso';
 import { scatterDecorations, type DecoKind } from './decorations';
 import { buildTerrainMap } from './terrain-map';
 
@@ -127,6 +128,8 @@ export class GameView {
 
     if (this.theme.style === 'topdown' && hasTilemaps()) {
       worldLayer.addChild(buildTilemap(this.theme)); // niesortowana warstwa tła pod unitLayer
+    } else if (this.theme.style === 'iso' && hasIsoTiles()) {
+      worldLayer.addChild(buildIsoTilemap(this.theme));
     } else {
       worldLayer.addChild(drawTerrain(this.theme, projection));
     }
@@ -139,7 +142,7 @@ export class GameView {
 
     // Dekoracje: kwiaty/krzaki płasko pod jednostkami (worldLayer, przed unitLayer),
     // drzewa/skały zasłaniające w unitLayer z głębokością (jak budynki/jednostki).
-    if (this.theme.style === 'topdown') {
+    if (this.theme.style === 'topdown' || this.theme.style === 'iso') {
       const terrain = buildTerrainMap(this.theme);
       for (const p of scatterDecorations(this.theme, terrain)) {
         const tex = getDecorationTexture(p.kind);
@@ -174,6 +177,7 @@ export class GameView {
       loadTilemaps(this.theme.id),
       loadBuildingSprites(this.theme.id),
       loadDecorationSprites(this.theme.id),
+      loadIsoTiles(this.theme.id),
     ]);
 
     this.unsubscribe = useWorld.subscribe((state) => this.reconcile(state.heroes, state.peons, state.missions));

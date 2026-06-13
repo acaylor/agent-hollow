@@ -16,7 +16,8 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const theme = process.argv[2] ?? 'fantasy';
 const subdir = process.argv[3] ?? 'buildings';
-const inDir = join(root, `downloads/objects/${subdir}`);
+const raw = process.argv[4] === 'raw'; // raw = bez bg-removal/trim (kafle terenu izo: zachowaj pełny diament)
+const inDir = join(root, `downloads/objects/${theme}/${subdir}`);
 const outDir = join(root, `packages/client/public/assets/${theme}/${subdir}`);
 
 /**
@@ -78,7 +79,8 @@ mkdirSync(outDir, { recursive: true });
 const ids = [];
 for (const f of readdirSync(inDir).filter((f) => f.endsWith('.png'))) {
   const id = f.replace(/\.png$/, '');
-  const trimmed = trim(removeBackground(PNG.sync.read(readFileSync(join(inDir, f)))));
+  const src = PNG.sync.read(readFileSync(join(inDir, f)));
+  const trimmed = raw ? src : trim(removeBackground(src));
   writeFileSync(join(outDir, `${id}.png`), PNG.sync.write(trimmed));
   writeFileSync(
     join(outDir, `${id}.json`),
