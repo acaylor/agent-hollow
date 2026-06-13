@@ -12,6 +12,12 @@ describe('toolToBuilding', () => {
     expect(toolToBuilding('WebSearch')).toBe('tower');
   });
 
+  it('narzędzia subagentów: StructuredOutput→koszary, ToolSearch→biblioteka, KillShell→kopalnia', () => {
+    expect(toolToBuilding('StructuredOutput')).toBe('barracks');
+    expect(toolToBuilding('ToolSearch')).toBe('library');
+    expect(toolToBuilding('KillShell')).toBe('mine');
+  });
+
   it('Bash z poleceniem git → targ (karawana z towarem)', () => {
     expect(toolToBuilding('Bash', 'git commit -m "x"')).toBe('market');
     expect(toolToBuilding('Bash', 'git push origin main')).toBe('market');

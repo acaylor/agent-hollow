@@ -493,12 +493,21 @@ export class GameView {
   }
 
   private steer(unit: Unit, state: string, tool?: string, detail?: string, slot = 0): void {
+    // Dom: bohater wraca do Twierdzy, peon (pomocnik) mustruje w Koszarach.
+    const home: BuildingId = unit.isPeon ? 'barracks' : 'citadel';
     let buildingId: BuildingId;
-    if (state === 'working') buildingId = toolToBuilding(tool, detail);
-    else if (state === 'thinking' || state === 'awaiting-input' || state === 'error') {
-      this.targets.delete(unit.id); // zostań gdzie jesteś
+    if (state === 'working') {
+      buildingId = toolToBuilding(tool, detail);
+      // Nieznane narzędzie daje fallback 'citadel'. Dla peona to zła stopa: spawnuje
+      // się przy rodzicu (zwykle Twierdza), więc cel=Twierdza ⇒ pusta ścieżka ⇒ stoi.
+      // Kieruj go do Koszar, żeby faktycznie biegł.
+      if (buildingId === 'citadel' && unit.isPeon) buildingId = 'barracks';
+    } else if (!unit.isPeon && (state === 'thinking' || state === 'awaiting-input' || state === 'error')) {
+      this.targets.delete(unit.id); // bohater: zostań gdzie jesteś
       return;
-    } else buildingId = 'citadel';
+    } else {
+      buildingId = home; // peon ZAWSZE ma cel — nie zastyga w stosie przy Twierdzy
+    }
 
     const key = `${state === 'working' ? 'w' : 'home'}:${buildingId}`;
     if (this.targets.get(unit.id) === key) return;
@@ -507,9 +516,9 @@ export class GameView {
     const door = this.building(buildingId).door;
     const startNode = this.graph.nearest(unit.gx, unit.gy);
     const route = this.graph.route(startNode.id, `door:${buildingId}`);
-    // Praca: ciasny rozrzut przy drzwiach. Bezczynność: szeroki krąg wokół twierdzy,
-    // żeby tłum bohaterów się nie nakładał (declutter sprite'ów i etykiet).
-    const spot = state === 'working' ? spotJitter(unit.id, slot) : idleScatter(unit.id);
+    // Bohater przy pracy: ciasny rozrzut przy drzwiach. Peony i bezczynni bohaterowie:
+    // szeroki krąg wokół budynku, żeby się nie nakładali (declutter sprite'ów i etykiet).
+    const spot = !unit.isPeon && state === 'working' ? spotJitter(unit.id, slot) : idleScatter(unit.id);
     route.push({ id: 'spot', gx: door.gx + spot.dx, gy: door.gy + spot.dy });
     unit.setPath(route);
   }

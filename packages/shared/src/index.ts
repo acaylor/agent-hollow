@@ -105,9 +105,12 @@ const TOOL_BUILDING: Record<string, BuildingId> = {
   LSP: 'library',
   Bash: 'mine',
   BashOutput: 'mine',
+  KillShell: 'mine',
   Task: 'barracks',
   Agent: 'barracks',
   Workflow: 'barracks',
+  StructuredOutput: 'barracks', // subagenci workflow zwracają wynik tym narzędziem
+  ToolSearch: 'library',
 };
 
 /** Polecenia gitowe w Bash kierujemy na targ (karawana z towarem). */
