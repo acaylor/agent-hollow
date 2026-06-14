@@ -17,10 +17,13 @@ if (demoMode) {
   app.get('/hooks/status', async () => ({ installed: false, demo: true }));
   app.get('/building-stats', async () => ({ updatedAt: new Date().toISOString(), buildings: {} }));
 } else {
-  const { TranscriptWatcher } = await import('./watcher.js');
+  const { SourceWatcher } = await import('./watcher.js');
+  const { SOURCES } = await import('./sources/index.js');
   const { translateHook, hooksInstalled, installHooks, uninstallHooks } = await import('./hooks.js');
   const { getBuildingStats } = await import('./building-stats.js');
-  const watcher = new TranscriptWatcher(world);
+  const watchers = SOURCES.map((source) => new SourceWatcher(world, source));
+  // Hooki HTTP są kanałem Claude → kierujemy je do watchera Claude.
+  const claudeWatcher = watchers.find((w) => w.id === 'claude') ?? watchers[0];
 
   // Statystyki zużycia tokenów per budynek (skan transkryptów, cache 60 s).
   app.get('/building-stats', async () => getBuildingStats());
@@ -28,7 +31,7 @@ if (demoMode) {
   // Szybki kanał zdarzeń: hooki HTTP Claude Code (typ "http" w settings.json).
   app.post('/hooks', async (request) => {
     const translated = translateHook((request.body ?? {}) as never);
-    if (translated) watcher.applyExternalFacts(translated.sessionId, translated.projectDir, translated.facts);
+    if (translated) claudeWatcher.applyExternalFacts(translated.sessionId, translated.projectDir, translated.facts);
     return { ok: true };
   });
   app.get('/hooks/status', async () => ({ installed: await hooksInstalled() }));
@@ -43,8 +46,8 @@ if (demoMode) {
   });
 
   app.addHook('onReady', async () => {
-    watcher.start();
-    app.log.info('Watcher transkryptów: obserwuję ~/.claude/projects');
+    for (const w of watchers) w.start();
+    app.log.info(`Watchery źródeł aktywne: ${watchers.map((w) => w.id).join(', ')}`);
   });
 }
 
