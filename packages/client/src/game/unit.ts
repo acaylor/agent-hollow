@@ -9,9 +9,9 @@ const SPEED_GRID_PER_S = 2.2;
 /** Jak długo (s) dymek roboczy jest widoczny po zmianie treści (potem chowamy — declutter). */
 const BUBBLE_TTL = 7;
 
-/** Skala sprite'a PixelLab (~68px canvas) do skali jednostki na kaflu 48px. */
+/** Domyślna skala sprite'a (fantasy/standard ~68px). Motyw nadpisuje przez ThemeDef.heroSprite. */
 const SPRITE_SCALE = 0.8;
-/** Kotwica Y sprite'a wyliczona z pikseli: stopa ≈ wiersz 57-59/68 → 0.87. */
+/** Domyślna kotwica Y stopy (fantasy/standard: wiersz 57-59/68 → 0.87). Nadpisywana per motyw. */
 const SPRITE_FOOT_ANCHOR = 0.87;
 /** Kolor odznaki Codeksa (zielony OpenAI). Claude nie dostaje odznaki. */
 const CODEX_BADGE = 0x10a37f;
@@ -48,6 +48,8 @@ export class Unit {
     private readonly projection: Projection,
     sheet?: Spritesheet | null,
     agent: AgentKind = 'claude',
+    spriteScale: number = SPRITE_SCALE,
+    spriteFootAnchor: number = SPRITE_FOOT_ANCHOR,
   ) {
     this.gx = start.gx;
     this.gy = start.gy;
@@ -57,8 +59,8 @@ export class Unit {
       // (scale.x / alpha na this.body) działała bez zmian. Tor animacji wybiera update().
       this.sheet = sheet;
       const sprite = new AnimatedSprite(sheet.animations.idle);
-      sprite.anchor.set(0.5, SPRITE_FOOT_ANCHOR);
-      sprite.scale.set(isPeon ? SPRITE_SCALE * 0.8 : SPRITE_SCALE);
+      sprite.anchor.set(0.5, spriteFootAnchor);
+      sprite.scale.set(isPeon ? spriteScale * 0.8 : spriteScale);
       sprite.animationSpeed = 0.15;
       sprite.play();
       this.animated = sprite;

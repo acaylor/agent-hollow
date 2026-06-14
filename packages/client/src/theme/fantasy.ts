@@ -12,6 +12,7 @@ export const FANTASY: ThemeDef = {
   style: 'iso',
   projection: isometric(64, 32),
   tile: 64,
+  heroSprite: { scale: 0.8, footAnchor: 0.87 },
   grid: { w: 40, h: 26 },
   buildings: [
     { id: 'citadel', label: 'Twierdza', gx: 16.5, gy: 9, w: 4, h: 3, door: { gx: 19.5, gy: 14.5 }, placeholderColor: 0x8a8a85 },

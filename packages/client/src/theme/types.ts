@@ -34,6 +34,13 @@ export interface ThemeDef {
   projection: Projection;
   /** Rozmiar kafla w px (do terenu i skali jednostek). */
   tile: number;
+  /**
+   * Kalibracja sprite'ów bohaterów, zależna od źródła generacji PixelLab
+   * (fantasy = standard 68px, sci-fi = v3 92px). `scale` skaluje canvas do
+   * rozmiaru jednostki; `footAnchor` (0..1) ustawia stopę na pozycji jednostki.
+   * Punkt strojenia usera.
+   */
+  heroSprite: { scale: number; footAnchor: number };
   grid: { w: number; h: number };
   buildings: BuildingDef[];
   /** Dodatkowe węzły-skrzyżowania; drzwi budynków dochodzą automatycznie. */

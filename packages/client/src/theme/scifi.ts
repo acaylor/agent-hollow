@@ -12,6 +12,9 @@ export const SCIFI: ThemeDef = {
   style: 'iso',
   projection: isometric(64, 32),
   tile: 64,
+  // Bohaterowie sci-fi generowani w v3 (canvas 92px, stopa ≈ 0.74) — inna
+  // kalibracja niż fantasy (standard 68px). Treść ~42px × 1.0 ≈ render fantasy.
+  heroSprite: { scale: 1.0, footAnchor: 0.74 },
   grid: { w: 40, h: 26 },
   buildings: [
     { id: 'citadel', label: 'Centrum dowodzenia', gx: 16.5, gy: 9, w: 4, h: 3, door: { gx: 19.5, gy: 14.5 }, placeholderColor: 0x8c93a8 },
