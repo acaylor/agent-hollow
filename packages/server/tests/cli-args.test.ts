@@ -26,4 +26,14 @@ describe('parseArgs', () => {
     expect(() => parseArgs(['--port', 'abc'])).toThrow();
     expect(() => parseArgs(['--port', '99999'])).toThrow();
   });
+
+  it('rzuca na nieznaną opcję', () => {
+    expect(() => parseArgs(['--cos'])).toThrow(/Nieznana opcja/);
+  });
+
+  it('rzuca gdy --port/-p bez wartości', () => {
+    expect(() => parseArgs(['-p'])).toThrow();
+    expect(() => parseArgs(['--port'])).toThrow();
+    expect(() => parseArgs(['--port='])).toThrow();
+  });
 });

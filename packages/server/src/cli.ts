@@ -50,6 +50,7 @@ async function main(): Promise<void> {
       return;
     } catch (err) {
       const e = err as NodeJS.ErrnoException;
+      // Próbujemy do 10 portów: gdy dziesiąty (attempt === 9) też zajęty, rzucamy błąd.
       if (e.code === 'EADDRINUSE' && attempt < 9) {
         port += 1;
         continue;

@@ -8,9 +8,12 @@ export interface CliOptions {
 }
 
 function parsePort(value: string | undefined): number {
+  if (value === undefined || value === '') {
+    throw new Error(`Nieprawidłowy port: ${value === undefined ? '(brak)' : '(pusty)'}`);
+  }
   const n = Number(value);
   if (!Number.isInteger(n) || n < 0 || n > 65535) {
-    throw new Error(`Nieprawidłowy port: ${value ?? '(brak)'}`);
+    throw new Error(`Nieprawidłowy port: ${value}`);
   }
   return n;
 }
