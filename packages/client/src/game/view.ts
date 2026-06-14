@@ -25,6 +25,13 @@ const DECO_W: Record<DecoKind, number> = { tree: 1.1, rock: 0.8, bush: 0.75, flo
 
 /** Margines „dzikiej ziemi" (kafle poza siatką rozgrywki) wypełniający rogi ekranu. */
 const WORLD_MARGIN_TILES = 4;
+/**
+ * Dodatkowy zapas nad terenem (w kaflach) na wysokie bryły. Sprite budynku jest
+ * kotwiczony u stopy (0.5, 1) i rośnie w GÓRĘ, więc szczyt np. wieży maga sięga
+ * ponad górny brzeg świata liczony z kafli terenu — i przy „cover" bywa ucinany.
+ * Zapas wypełnia isoFillRange trawą (nie ciemnością), opuszcza i centruje planszę.
+ */
+const TOP_SPRITE_HEADROOM_TILES = 2;
 /** Górny limit przybliżenia (kontrolki/kółko). Dolny = „cover" liczony dynamicznie. */
 const MAX_ZOOM = 5;
 
@@ -125,7 +132,10 @@ export class GameView {
     ];
     const minX = Math.min(...corners.map((c) => c.x));
     const maxX = Math.max(...corners.map((c) => c.x));
-    const minY = Math.min(...corners.map((c) => c.y));
+    // Zapas u góry na wysokie bryły (kotwica u stopy → sprite rośnie w górę).
+    // Bez tego szczyt wieży maga wystaje ponad prostokąt świata i jest ucinany przy
+    // „cover". isoFillRange wypełni ten pas trawą, więc plansza opada i centruje się.
+    const minY = Math.min(...corners.map((c) => c.y)) - TOP_SPRITE_HEADROOM_TILES * this.theme.tile;
     const maxY = Math.max(...corners.map((c) => c.y));
     const worldWidth = maxX - minX;
     const worldHeight = maxY - minY;
