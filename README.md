@@ -8,6 +8,23 @@ wieża maga = research w sieci, kopalnia = terminal…).
 
 Dwa motywy: **fantasy** (top-down) i **sci-fi** (izometria).
 
+## Instalacja przez npm
+
+Po publikacji pakiet uruchamia się bez instalacji:
+
+```bash
+npx ai-of-agents          # podgląda sesje z ~/.claude/projects, wypisuje URL
+npx ai-of-agents --demo   # tryb demo (sztuczne dane)
+npx ai-of-agents --open   # dodatkowo otwiera przeglądarkę
+```
+
+Albo globalnie (komendy `ai-of-agents` i krótszy alias `aioa`):
+
+```bash
+npm i -g ai-of-agents
+aioa --open
+```
+
 ## Szybki start
 
 ```bash
