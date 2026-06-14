@@ -50,10 +50,13 @@
   justify-content: center;
   cursor: pointer;
   gap: 2px;
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 
+/* Zaznaczenie: uniesienie + poświata w kolorze drużyny (inline) — NIE biały outline,
+   który zasłaniał kolorową ramkę drużyny. */
 .portrait.selected {
-  outline: 2px solid #f1efe8;
+  transform: translateY(-3px);
 }
 
 .portrait .face {

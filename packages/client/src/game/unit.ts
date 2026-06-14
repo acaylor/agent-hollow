@@ -31,6 +31,9 @@ export class Unit {
   private sheet?: Spritesheet;
   private aura = new Graphics();
   private crate = new Graphics();
+  private teamRing = new Graphics();
+  private selectionRing = new Graphics();
+  private selected = false;
   private overlay = new Text({ text: '', style: labelStyle });
   private bubble = new Text({ text: '', style: { ...labelStyle, fontSize: 10 } });
   private nameTag: Text;
@@ -70,6 +73,16 @@ export class Unit {
       this.body = buildUnitBody(teamColor(colorIndex), isPeon);
     }
 
+    // Pierścień koloru drużyny u stóp — ZAWSZE widoczny (także pod spritem PixelLab),
+    // by od jednego spojrzenia rozpoznać drużynę. Ciemny kontur pod spodem dla kontrastu.
+    const ringRx = (isPeon ? 0.7 : 1) * 12;
+    const ringRy = (isPeon ? 0.7 : 1) * 5.5;
+    this.teamRing.ellipse(0, 2, ringRx, ringRy).stroke({ color: 0x14120c, width: 3.5, alpha: 0.5 });
+    this.teamRing.ellipse(0, 2, ringRx, ringRy).stroke({ color: teamColor(colorIndex), width: 2.5, alpha: 0.95 });
+    // Pierścień zaznaczenia — biały, pulsujący, większy; odróżnia „wybranego" bez gubienia koloru drużyny.
+    this.selectionRing.ellipse(0, 2, ringRx + 3.5, ringRy + 2).stroke({ color: 0xffffff, width: 2, alpha: 0.9 });
+    this.selectionRing.visible = false;
+
     this.aura.circle(0, -12, 18).fill({ color: 0x7f77dd, alpha: 0.25 });
     this.aura.visible = false;
 
@@ -91,7 +104,7 @@ export class Unit {
     this.nameTag.position.set(0, 6);
     this.nameTag.alpha = 0.9;
 
-    this.container.addChild(this.aura, this.body, this.crate, this.overlay, this.bubble, this.nameTag);
+    this.container.addChild(this.aura, this.selectionRing, this.teamRing, this.body, this.crate, this.overlay, this.bubble, this.nameTag);
 
     const badge = buildAgentBadge(agent);
     if (badge) this.container.addChild(badge);
@@ -123,6 +136,14 @@ export class Unit {
   /** Zaznaczenie z HUD — wtedy dymek roboczy widoczny bez limitu czasu. */
   setBubbleForced(forced: boolean): void {
     this.bubbleForced = forced;
+  }
+
+  /** Zaznaczenie z HUD/mapy — pulsujący biały pierścień u stóp wybranej jednostki. */
+  setSelected(on: boolean): void {
+    if (this.selected === on) return;
+    this.selected = on;
+    this.selectionRing.visible = on;
+    if (!on) this.selectionRing.scale.set(1);
   }
 
   setState(state: HeroStateKind, bubbleText?: string): void {
@@ -196,6 +217,8 @@ export class Unit {
     if (this.overlay.text === '!') {
       this.overlay.position.y = -34 + Math.sin(this.elapsed * 5) * 3;
     }
+
+    if (this.selected) this.selectionRing.scale.set(1 + Math.sin(this.elapsed * 4) * 0.08);
 
     // Dymek: świeży (po zmianie) lub gdy jednostka zaznaczona — reszta czasu schowany.
     this.bubble.visible = this.bubble.text !== '' && (this.bubbleForced || this.elapsed < this.bubbleUntil);

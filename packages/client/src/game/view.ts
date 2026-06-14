@@ -232,6 +232,7 @@ export class GameView {
       const selected = useWorld.getState().selectedSessionId;
       for (const [id, unit] of this.units) {
         unit.setBubbleForced(id === selected);
+        unit.setSelected(id === selected);
         unit.update(dt);
       }
       this.wanderIdle();

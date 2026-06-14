@@ -6,8 +6,17 @@ import { DEFAULT_THRESHOLDS, SessionTracker, type StateThresholds } from './stat
 import type { AgentSource, ClassifiedFile } from './sources/types.js';
 import type { World } from './world.js';
 
-/** Sesje starsze niż to okno ignorujemy przy starcie (historia, nie żywe). */
-const LIVE_WINDOW_MS = 10 * 60_000;
+/**
+ * Czy sesja jest „żywa" przy starcie serwera. Okno = removeAfterMs (z progów):
+ * tworzymy bohatera tylko dla sesji, której maszyna stanów i tak by od razu nie
+ * usunęła. Dzięki temu sesje w toku, ale chwilowo ciche (czekają na input, autor
+ * odszedł na chwilę), pojawiają się od razu, a stare nie migoczą (nie powstają
+ * tylko po to, by zniknąć na pierwszym sweepie). Wcześniej sztywne 10 min gubiło
+ * trwające sesje, które przez moment nic nie dopisały do transkryptu.
+ */
+export function isLiveAtStartup(mtimeMs: number, nowMs: number, windowMs: number): boolean {
+  return mtimeMs > nowMs - windowMs;
+}
 /** Większe pliki tail-ujemy od końca zamiast odtwarzać całą historię. */
 const REPLAY_MAX_BYTES = 2 * 1024 * 1024;
 const SWEEP_INTERVAL_MS = 15_000;
@@ -97,7 +106,7 @@ export class SourceWatcher {
     if (target.kind === 'other') return;
 
     if (!this.tails.has(path)) {
-      const fresh = !initial || (stats?.mtimeMs ?? 0) > Date.now() - LIVE_WINDOW_MS;
+      const fresh = !initial || isLiveAtStartup(stats?.mtimeMs ?? 0, Date.now(), this.thresholds.removeAfterMs);
       if (!fresh) return; // stara sesja — obudzi się przy zdarzeniu 'change'
       if ((stats?.size ?? 0) > REPLAY_MAX_BYTES) await this.tails.registerAtEnd(path);
     }

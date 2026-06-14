@@ -1,5 +1,5 @@
 import { getGameView } from '../game/view';
-import { TEAM_COLORS } from '../game/placeholders';
+import { teamColorHex } from '../game/placeholders';
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
 
@@ -15,13 +15,17 @@ export function Portraits() {
   return (
     <div className="hud-panel portraits">
       {list.map((hero) => {
-        const color = TEAM_COLORS[hero.teamColor % TEAM_COLORS.length];
-        const cssColor = `#${color.toString(16).padStart(6, '0')}`;
+        const cssColor = teamColorHex(hero.teamColor);
+        const isSel = selected === hero.sessionId;
         return (
           <div
             key={hero.sessionId}
-            className={`portrait${selected === hero.sessionId ? ' selected' : ''}`}
-            style={{ borderColor: cssColor, opacity: hero.state === 'sleeping' ? 0.5 : 1 }}
+            className={`portrait${isSel ? ' selected' : ''}`}
+            style={{
+              borderColor: cssColor,
+              opacity: hero.state === 'sleeping' ? 0.5 : 1,
+              boxShadow: isSel ? `0 0 0 2px ${cssColor}, 0 6px 16px ${cssColor}66` : undefined,
+            }}
             title={hero.title}
             onClick={() => {
               select(hero.sessionId);

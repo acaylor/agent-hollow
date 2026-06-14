@@ -92,9 +92,9 @@ export function SidePanel() {
 
   return (
     <div className="hud-panel sidepanel">
-      <div className="head">
+      <div className="head" style={{ boxShadow: `inset 3px 0 0 ${teamColorHex(hero.teamColor)}` }}>
         <div style={{ display: 'flex', gap: 8, minWidth: 0 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: teamColorHex(hero.teamColor), marginTop: 4, flex: 'none' }} />
+          <span style={{ width: 14, height: 14, borderRadius: '50%', background: teamColorHex(hero.teamColor), border: '1px solid rgba(0,0,0,.4)', marginTop: 3, flex: 'none' }} />
           <div style={{ minWidth: 0 }}>
             <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{hero.title}</strong>
             {(() => {
