@@ -206,3 +206,125 @@ button.ghost {
   font-size: 12px;
   padding: 2px 8px;
 }
+
+/* ── Powiadomienia (lewa strona, efemeryczne toasty) ── */
+.notif-feed {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 300px;
+  max-width: 32vw;
+  pointer-events: none; /* tło mapy klikalne między toastami */
+  z-index: 5;
+}
+
+/* .notif współdzieli chrome .hud-panel; nadpisujemy pozycję na statyczną w flexie. */
+.notif {
+  position: relative;
+  pointer-events: auto;
+  padding: 8px 10px 11px;
+  border-left-width: 4px;
+  overflow: hidden;
+  animation: notif-in 240ms ease-out;
+  transition: opacity 400ms ease, transform 400ms ease;
+}
+.notif.leaving {
+  opacity: 0;
+  transform: translateX(-14px);
+}
+.notif--alert {
+  border-left-color: #ef9f27;
+}
+.notif--error {
+  border-left-color: #e24b4a;
+}
+.notif--success {
+  border-left-color: #1d9e75;
+}
+
+.notif-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.notif-tag {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.9;
+}
+.notif--alert .notif-tag {
+  color: #ef9f27;
+}
+.notif--error .notif-tag {
+  color: #e24b4a;
+}
+.notif--success .notif-tag {
+  color: #5dcaa5;
+}
+.notif-x {
+  margin-left: auto;
+  background: none;
+  border: 0;
+  color: #888780;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  padding: 0 2px;
+}
+.notif-x:hover {
+  color: #f1efe8;
+}
+.notif-title {
+  font-size: 13px;
+  line-height: 1.35;
+  margin-top: 4px;
+}
+.notif-meta {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+.notif-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  animation: notif-countdown linear forwards;
+}
+.notif--alert .notif-bar {
+  background: #ef9f27;
+}
+.notif--error .notif-bar {
+  background: #e24b4a;
+}
+.notif--success .notif-bar {
+  background: #1d9e75;
+}
+.notif.paused .notif-bar {
+  animation-play-state: paused;
+}
+
+@keyframes notif-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes notif-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

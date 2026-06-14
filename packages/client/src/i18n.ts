@@ -1,4 +1,5 @@
 import type { HeroStateKind, BuildingId } from '@agent-citadel/shared';
+import type { NotifReason } from './notifications';
 import { useSettings, type Lang } from './settings';
 
 /**
@@ -44,6 +45,10 @@ export interface UiStrings {
   currentTask: string;
   recentActions: string;
   now: string;
+  /** Etykiety powiadomień (powód → krótki tekst nagłówka). */
+  notif: Record<NotifReason, string>;
+  notifClose: string;
+  notifJump: string;
 }
 
 const EN: UiStrings = {
@@ -90,6 +95,14 @@ const EN: UiStrings = {
   currentTask: 'Current task',
   recentActions: 'Recent actions',
   now: 'now',
+  notif: {
+    'needs-you': 'needs your call',
+    error: 'hit a snag',
+    'mission-done': 'task complete',
+    'new-session': 'new session',
+  },
+  notifClose: 'Close',
+  notifJump: 'click to jump',
 };
 
 const PL: UiStrings = {
@@ -136,6 +149,14 @@ const PL: UiStrings = {
   currentTask: 'Bieżące zadanie',
   recentActions: 'Ostatnie akcje',
   now: 'teraz',
+  notif: {
+    'needs-you': 'agent wzywa pomocy',
+    error: 'potknięcie',
+    'mission-done': 'zadanie wykonane',
+    'new-session': 'nowa sesja',
+  },
+  notifClose: 'Zamknij',
+  notifJump: 'kliknij, by skoczyć',
 };
 
 const UI: Record<Lang, UiStrings> = { en: EN, pl: PL };

@@ -1,5 +1,6 @@
 import { GameCanvas } from './GameCanvas';
 import { MissionLog } from './hud/MissionLog';
+import { NotificationFeed } from './hud/NotificationFeed';
 import { Minimap } from './hud/Minimap';
 import { Portraits } from './hud/Portraits';
 import { ResourceBar } from './hud/ResourceBar';
@@ -16,6 +17,7 @@ export function App() {
       <ThemeSwitch />
       <ResourceBar />
       <MissionLog />
+      <NotificationFeed />
       <SidePanel />
       <BuildingPanel />
       <Portraits />
