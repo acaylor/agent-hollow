@@ -3,8 +3,8 @@ import { toolToBuilding, type BuildingId, type HeroStateKind, type TranscriptLin
 import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
-import { TEAM_COLORS } from '../game/placeholders';
-import { clip, formatK } from '../util';
+import { teamColorHex } from '../game/placeholders';
+import { clip, formatK, relTime } from '../util';
 import { StatTile } from './StatTile';
 
 // Stała referencja — selektor zwracający świeże [] przy każdym wywołaniu
@@ -33,11 +33,6 @@ const BUILDING_EMOJI: Record<BuildingId, string> = {
   market: '📦',
   guild: '🔌',
 };
-
-function hexColor(index: number): string {
-  const c = TEAM_COLORS[index % TEAM_COLORS.length];
-  return `#${c.toString(16).padStart(6, '0')}`;
-}
 
 /** Panel wybranej sesji: karta pionka (stan, statystyki, zadanie, ostatnie akcje) + transkrypt. */
 export function SidePanel() {
@@ -93,7 +88,7 @@ export function SidePanel() {
     <div className="hud-panel sidepanel">
       <div className="head">
         <div style={{ display: 'flex', gap: 8, minWidth: 0 }}>
-          <span style={{ width: 12, height: 12, borderRadius: '50%', background: hexColor(hero.teamColor), marginTop: 4, flex: 'none' }} />
+          <span style={{ width: 12, height: 12, borderRadius: '50%', background: teamColorHex(hero.teamColor), marginTop: 4, flex: 'none' }} />
           <div style={{ minWidth: 0 }}>
             <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{hero.title}</strong>
             <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
@@ -191,12 +186,3 @@ function fmtDuration(startedAt: string, now: number): string {
   return `${h}h ${Math.round(m % 60)}m`;
 }
 
-/** Czas względny akcji: "teraz" / "5s" / "3m" / "2h". */
-function relTime(ts: string, now: number, nowLabel: string): string {
-  const s = Math.max(0, (now - Date.parse(ts)) / 1000);
-  if (!isFinite(s) || s < 5) return nowLabel;
-  if (s < 60) return `${Math.round(s)}s`;
-  const m = s / 60;
-  if (m < 60) return `${Math.round(m)}m`;
-  return `${Math.round(m / 60)}h`;
-}

@@ -11,3 +11,13 @@ export function formatK(value: number): string {
   if (value >= 1_000) return `${Math.round(value / 1_000)}k`;
   return String(value);
 }
+
+/** Czas względny akcji: "teraz" / "5s" / "3m" / "2h" (nowLabel dla <5 s). */
+export function relTime(ts: string, now: number, nowLabel: string): string {
+  const s = Math.max(0, (now - Date.parse(ts)) / 1000);
+  if (!isFinite(s) || s < 5) return nowLabel;
+  if (s < 60) return `${Math.round(s)}s`;
+  const m = s / 60;
+  if (m < 60) return `${Math.round(m)}m`;
+  return `${Math.round(m / 60)}h`;
+}

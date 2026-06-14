@@ -16,6 +16,11 @@ export function teamColor(index: number): number {
   return TEAM_COLORS[index % TEAM_COLORS.length];
 }
 
+/** Kolor drużyny jako string CSS (#rrggbb) — do HUD (kropki w panelach). */
+export function teamColorHex(index: number): string {
+  return `#${teamColor(index).toString(16).padStart(6, '0')}`;
+}
+
 export const labelStyle = new TextStyle({
   fontFamily: 'monospace',
   fontSize: 11,

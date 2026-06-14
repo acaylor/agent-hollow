@@ -3,7 +3,8 @@ import { toolToBuilding, type BuildingId, type BuildingStatsResponse, type Build
 import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
-import { clip, formatK } from '../util';
+import { clip, formatK, relTime } from '../util';
+import { teamColorHex } from '../game/placeholders';
 import { StatTile } from './StatTile';
 
 const EMPTY: BuildingWindowStats = { today: 0, week: 0, month: 0 };
@@ -55,6 +56,15 @@ export function BuildingPanel() {
   );
   const workingNow = workerHeroes.length + workerPeons.length;
 
+  // Lista „co się tu działo" — ostatnie akcje WSZYSTKICH bohaterów odfiltrowane do
+  // tego budynku (z bufora recentActions), najnowsze pierwsze.
+  const now = Date.now();
+  const activity = Object.values(heroes)
+    .flatMap((h) => (h.recentActions ?? []).map((a) => ({ a, hero: h })))
+    .filter(({ a }) => toolToBuilding(a.tool, a.detail) === buildingId)
+    .sort((x, y) => y.a.ts.localeCompare(x.a.ts))
+    .slice(0, 8);
+
   return (
     <div className="hud-panel sidepanel" style={{ overflowY: 'auto' }}>
       <div className="head">
@@ -83,6 +93,26 @@ export function BuildingPanel() {
               ⛏️ {clip(p.description ?? 'peon', 40)}
             </div>
           ))}
+        </div>
+      )}
+
+      {activity.length > 0 && (
+        <div style={{ borderTop: '1px solid #33332f', paddingTop: 8 }}>
+          <div className="px" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', opacity: 0.6, marginBottom: 6 }}>
+            {t.recentActions}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5, fontSize: 12 }}>
+            {activity.map(({ a, hero }, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span style={{ width: 8, height: 8, background: teamColorHex(hero.teamColor), flex: 'none' }} />
+                <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {clip(hero.title, 22)}
+                  {a.detail ? <span style={{ opacity: 0.65 }}> · {a.detail}</span> : null}
+                </span>
+                <span style={{ opacity: 0.45, fontSize: 11, flex: 'none' }}>{relTime(a.ts, now, t.now)}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
