@@ -270,9 +270,11 @@ export class GameView {
       this.updateParticles(dt);
     });
 
-    this.unsubscribe = useWorld.subscribe((state) => this.reconcile(state.heroes, state.peons, state.missions));
-    const { heroes, peons, missions } = useWorld.getState();
-    this.reconcile(heroes, peons, missions);
+    this.unsubscribe = useWorld.subscribe((state) =>
+      this.reconcile(state.heroes, state.peons, state.missions, state.selectedProjectDir),
+    );
+    const { heroes, peons, missions, selectedProjectDir } = useWorld.getState();
+    this.reconcile(heroes, peons, missions, selectedProjectDir);
     activeView = this;
   }
 
@@ -381,7 +383,19 @@ export class GameView {
     heroes: Record<string, HeroSnapshot>,
     peons: Record<string, PeonSnapshot>,
     missions: Record<string, MissionSnapshot> = {},
+    projectFilter?: string,
   ): void {
+    // Filtruj bohaterów i peonów po wybranym projekcie (miasto).
+    // Peony mają parentSessionId — kierujemy się projektem rodzica.
+    const heroList = projectFilter
+      ? Object.values(heroes).filter((h) => h.projectDir === projectFilter)
+      : Object.values(heroes);
+    const projectHeroIds = new Set(heroList.map((h) => h.sessionId));
+    const peonList = projectFilter
+      ? Object.values(peons).filter((p) => projectHeroIds.has(p.parentSessionId))
+      : Object.values(peons);
+    // Dalej rysujemy WSZYSTKIE budynki, dekoracje itd. — filtr dotyczy
+    // tylko jednostek (kto jest w tej chwili widoczny).
     const seen = new Set<string>();
 
     // Fajerwerki przy przejściu misji active -> completed.
@@ -394,7 +408,7 @@ export class GameView {
       this.missionStatus.set(mission.id, mission.status);
     }
 
-    for (const hero of Object.values(heroes)) {
+    for (const hero of heroList) {
       seen.add(hero.sessionId);
       let unit = this.units.get(hero.sessionId);
       if (!unit) {
@@ -426,7 +440,7 @@ export class GameView {
       this.steer(unit, hero.state, hero.currentTool, hero.toolDetail, hero.teamColor);
     }
 
-    for (const peon of Object.values(peons)) {
+    for (const peon of peonList) {
       seen.add(peon.agentId);
       let unit = this.units.get(peon.agentId);
       if (!unit) {

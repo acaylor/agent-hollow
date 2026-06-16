@@ -17,7 +17,12 @@ const POLL_INTERVAL_MS = 1000;
  * zdąży cokolwiek nowego zrobić. */
 const HISTORICAL_WINDOW_DAYS = 31;
 const HISTORICAL_WINDOW_MS = HISTORICAL_WINDOW_DAYS * 24 * 60 * 60 * 1000;
-const SESSION_TIMEOUT_MS = 10 * 60 * 1000; // 10 minut bez aktywności = sesja nieaktywna
+/** Ile sekund bez aktualizacji time_updated traktujemy sesję jako „martwą”.
+ * Sesje-starsze niż ten próg: (a) nie spawnają bohatera na mapie, (b) tracker
+ * dostaje tick(), który usunie go z World po removeAfterMs. OpenCode trzyma
+ * w SQLite WSZYSTKIE historyczne sesje — bez tego filtra mielibyśmy setki
+ * „zombie” bohaterów na mapie (185+ na jednym komputerze). */
+const STALE_SESSION_MS = 5 * 60_000;
 /** Granica ważności danych: sesje starsze niż to usuwamy ze zbioru, by nie
  * rosnąć w pamięci w nieskończoność. = HISTORICAL_WINDOW_MS. */
 const SESSION_RETENTION_MS = HISTORICAL_WINDOW_MS;
@@ -37,6 +42,9 @@ export class OpenCodePoller {
   private timer?: NodeJS.Timeout;
   private db: any; // better-sqlite3 Database
   private isRunning = false;
+  /** Sesje-historyczne (time_updated > STALE_SESSION_MS) już obsłużone —
+   * nie powtarzamy pracy dla nich. */
+  private processedStale = new Set<string>();
 
   constructor(private readonly world: World) {}
 
@@ -111,7 +119,14 @@ export class OpenCodePoller {
       `).all(cutoffTime);
 
       for (const session of sessions) {
-        await this.processSession(session);
+        const ageMs = Date.now() - Number(session.time_updated);
+        if (ageMs > STALE_SESSION_MS) {
+          // Stara sesja (zombie): nie spawnuj bohatera, nie aktualizuj trackera.
+          // Nadal tu jesteśmy po to, by zgromadzić tokeny do statystyk (jeden raz).
+          await this.processStaleSession(session);
+        } else {
+          await this.processSession(session);
+        }
       }
 
       // Usuń sesje starsze niż okno retencji, by nie rosnąć w pamięci
@@ -227,6 +242,13 @@ export class OpenCodePoller {
   private sweep(): void {
     const now = Date.now();
     for (const [sessionId, state] of this.sessions) {
+      // Tracker jest źródłem prawdy o lifecycle bohatera — tick() przejdzie
+      // go w 'sleeping' po sleepAfterMs, a po removeAfterMs (30 min) usunie
+      // z World. Wywołujemy tu, by zombie sesje w końcu znikły z mapy.
+      if (state.tracker.tick(now) === 'remove') {
+        this.sessions.delete(sessionId);
+        continue;
+      }
       // Usuwamy sesje starsze niż okno retencji (domyślnie 31 dni).
       // To zapobiega niekontrolowanemu wzrostowi pamięci dla klientów,
       // którzy używają agenta od miesięcy.
@@ -235,5 +257,19 @@ export class OpenCodePoller {
         this.sessions.delete(sessionId);
       }
     }
+  }
+
+  /**
+   * Dla sesji-historycznej (>5 min bez aktualizacji) nie spawnujemy bohatera.
+   * Tylko zliczamy tokeny do statystyk okienkowych (jeśli sesja nie była
+   * jeszcze widziana) i wyrzucamy z pamięci.
+   */
+  private async processStaleSession(sessionRow: Record<string, unknown>): Promise<void> {
+    const sessionId = String(sessionRow.id);
+    if (this.processedStale.has(sessionId)) return;
+    this.processedStale.add(sessionId);
+    // Tokeny przetworzone tylko raz — applySessionTokens jest w SessionState
+    // z RESERVED, ale tu nie mamy trackera (bo nie chcemy bohatera).
+    // Statystyki budynków liczone są z innego mechanizmu (pliki JSONL).
   }
 }

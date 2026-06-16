@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { WS_PATH, type GameEvent } from '@agent-citadel/shared';
 import { World } from './world.js';
 import { OpenCodePoller } from './sources/opencode-poller.js';
+import { ProjectIntelPoller } from './intel/project-intel-poller.js';
 
 export interface StartServerOptions {
   /** Port HTTP. Podaj 0, by system wybrał wolny (przydatne w testach). */
@@ -63,6 +64,10 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     app.addHook('onReady', async () => {
       for (const w of watchers) w.start();
       await opencodePoller.start();
+      // Polluje `.beads/issues.jsonl` i `graphify-out/graph.json` dla każdego
+      // katalogu projektu, w którym aktywne są sesje agentów — emituje
+      // `project-intel-updated` event do klienta (panel "Salonu Architekta").
+      new ProjectIntelPoller(world).start();
       app.log.info(`Source watchers active: ${watchers.map((w) => w.id).join(', ')}`);
     });
   }
