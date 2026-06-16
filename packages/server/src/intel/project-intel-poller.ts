@@ -231,7 +231,12 @@ export class ProjectIntelPoller {
   private async refreshProject(projectDir: string): Promise<void> {
     const heroes = this.world.heroesByProject(projectDir);
     const activeAgents: AgentKind[] = [...new Set(heroes.map((h) => h.agent ?? 'claude'))];
-    const [beads, graphify] = await Promise.all([readBeads(projectDir), readGraphify(projectDir)]);
+    // projectDir to klucz miasta — dla źródła Claude jest to ZAKODOWANA nazwa folderu
+    // (~/.claude/projects/<enc>), NIE realna ścieżka. Pliki (.beads, graphify) czytamy z
+    // prawdziwego cwd bohatera (workingDir); fallback na projectDir dla źródeł, gdzie to już
+    // jest ścieżka (Koda/demo) lub zanim dotrze fakt `meta` z cwd.
+    const realDir = heroes.find((h) => h.workingDir)?.workingDir ?? projectDir;
+    const [beads, graphify] = await Promise.all([readBeads(realDir), readGraphify(realDir)]);
     const intel: ProjectIntel = {
       projectDir,
       projectName: heroes[0]?.projectName ?? deriveName(projectDir),

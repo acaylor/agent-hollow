@@ -117,4 +117,16 @@ describe('SessionTracker', () => {
     expect(tracker.tick(Date.now() + DEFAULT_THRESHOLDS.removeAfterMs + 1000)).toBe('remove');
     expect(world.getHero('sesja-1')).toBeUndefined();
   });
+
+  it('meta zapisuje pełny workingDir (cwd) obok projectName=basename', () => {
+    // Regresja: dla źródła Claude projectDir to zakodowana nazwa folderu, NIE ścieżka.
+    // Poller intelu czyta .beads z workingDir, więc cwd musi trafić do snapshotu w całości.
+    const world = new World();
+    const tracker = new SessionTracker(world, 'sesja-cwd', '-Users-mpawelczuk-RTS-agents');
+    tracker.apply({ kind: 'meta', cwd: '/Users/mpawelczuk/RTS agents' });
+    const hero = world.getHero('sesja-cwd');
+    expect(hero?.workingDir).toBe('/Users/mpawelczuk/RTS agents'); // pełna ścieżka
+    expect(hero?.projectName).toBe('RTS agents'); // basename do HUD
+    expect(hero?.projectDir).toBe('-Users-mpawelczuk-RTS-agents'); // klucz miasta bez zmian
+  });
 });

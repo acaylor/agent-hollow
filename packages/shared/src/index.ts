@@ -27,6 +27,10 @@ export interface HeroSnapshot {
   agent?: AgentKind;
   title: string;
   projectDir: string;
+  /** Realny, absolutny katalog roboczy (cwd z transkryptu). UWAGA: różny od `projectDir`,
+   *  które dla źródła Claude jest zakodowaną nazwą folderu (~/.claude/projects/<enc>).
+   *  Poller intelu czyta `.beads`/`graphify` z TEGO pola, nie z projectDir. */
+  workingDir?: string;
   /** Czytelna nazwa projektu (basename cwd, np. "RTS agents") — do HUD. */
   projectName?: string;
   model?: string;

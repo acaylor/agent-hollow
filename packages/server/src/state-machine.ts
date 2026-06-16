@@ -50,6 +50,7 @@ export class SessionTracker {
   private explicitTitle?: string; // jawny tytuł z CLI (custom-title/ai-title), jeśli wersja Claude go zapisze
   private firstSubstantialPrompt?: string; // pierwszy SENSOWNY prompt (nie "ok"/"dawaj") — stabilna nazwa
   private projectName?: string; // basename cwd, np. "RTS agents"
+  private workingDir?: string; // pełny cwd z transkryptu — realna ścieżka do .beads/graphify
   private recentActions: ActionEntry[] = []; // ostatnie narzędzia, najnowsze pierwsze (oś aktywności w panelu)
 
   private static readonly MAX_RECENT_ACTIONS = 5;
@@ -71,6 +72,7 @@ export class SessionTracker {
       agent: this.agent,
       title: this.displayTitle(),
       projectDir: this.projectDir,
+      workingDir: this.workingDir,
       projectName: this.projectName,
       teamColor: this.world.claimTeamColor(),
       state: 'idle',
@@ -130,9 +132,13 @@ export class SessionTracker {
         break;
 
       case 'meta':
-        if (fact.cwd) this.projectName = basename(fact.cwd);
+        if (fact.cwd) {
+          this.projectName = basename(fact.cwd);
+          this.workingDir = fact.cwd;
+        }
         this.patch({
           ...(this.projectName ? { projectName: this.projectName, title: this.displayTitle() } : {}),
+          ...(this.workingDir ? { workingDir: this.workingDir } : {}),
           ...(fact.model ? { model: fact.model } : {}),
           ...(fact.gitBranch ? { gitBranch: fact.gitBranch } : {}),
           ...(fact.permissionMode ? { permissionMode: fact.permissionMode } : {}),
