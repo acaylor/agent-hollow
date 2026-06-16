@@ -33,6 +33,7 @@ renders them as a calm, real-time strategy realm:
 - **Subagents → workers.** When a session spawns subagents (e.g. the Task tool), they appear as little workers around their settler.
 - **Tokens → harvest.** Tokens read and produced fill the storehouse. Settlers ponder while thinking, rest when waiting, and stroll home when the day's work is done.
 - **Two worlds.** Switch between a **fantasy** (top-down) and a **sci-fi** (isometric) realm on the fly.
+- **Many projects → cities.** Each project becomes a city you can switch between; open one for an optional peek at [Beads](https://github.com/steveyegge/beads) tasks and a [Graphify](https://github.com/safishamsi/graphify) code map (see [Project intel](#-project-intel-optional)).
 
 A glanceable, second-monitor view of what your agents are quietly up to.
 
@@ -85,6 +86,17 @@ agent session transcript ──▶ server (watcher + state machine) ──▶ We
 - The **server** tails JSONL transcripts, turns each line into a `Fact`, and runs a small per-session **state machine** (thinking / working / resting / idle / returning).
 - It broadcasts a `HeroSnapshot` for every session over a WebSocket. The snapshot carries *what* the session is doing (`currentTool`, recent actions, tokens) — never raw coordinates.
 - The **client** decides *where* each settler goes and renders the pixel-art realm, the HUD, the minimap and the side panel.
+
+## 🏛️ Project intel (optional)
+
+Run several projects at once and each becomes its own **city** in the top bar — switch between them, or pick **All** to see every settler together. A city shows how many agents are active and which kind (Claude, Codex, OpenCode, Koda).
+
+Select a city to open the **Architect's Hall**, a side panel that surfaces two optional, third-party signals about that project — read-only and entirely opt-in:
+
+- **📜 Beads** — open tasks from [Beads](https://github.com/steveyegge/beads), an AI-native issue tracker that lives in your repo. Age of Agents reads `.beads/issues.jsonl` (falling back to `bd list --json`). Turn it on in a project with `bd init`.
+- **🌳 Graph** — a code knowledge graph from [Graphify](https://github.com/safishamsi/graphify): symbol, edge and community counts plus the most-connected "god-nodes". Age of Agents reads `graphify-out/graph.json`.
+
+Neither tool is bundled or required. If a project has no `.beads/` or `graphify-out/`, the panel just reads "not initialized"; it polls every few seconds, so intel appears as soon as the files do.
 
 ## 🎨 Themes
 
