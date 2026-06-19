@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Sprite, Text, TextureStyle } from 'pixi.js';
+import { Application, Container, Graphics, Sprite, TextureStyle } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import type { HeroSnapshot, MissionSnapshot, PeonSnapshot } from '@agent-citadel/shared';
 import { useWorld } from '../store';
@@ -20,6 +20,7 @@ import { buildTerrainMap } from './terrain-map';
 import { BUILDING_FX, collectActiveBuildings, type WorkerSample } from './building-fx';
 import { buildingText } from '../i18n';
 import { homeBuilding, awaitingBuilding } from './home-building';
+import { worldLayerTransform, worldToViewport, flipTextNodes } from './flip';
 import type { Lang } from '../settings';
 
 /** Docelowa szerokość dekoracji w kaflach (do skalowania sprite'a). */
@@ -197,8 +198,9 @@ export class GameView {
 
     // Warstwa świata przesunięta tak, by współrzędne ujemne (izo) mieściły się w viewporcie.
     const worldLayer = (this.worldLayer = new Container());
-    worldLayer.scale.x = this.flipped ? -1 : 1;
-    worldLayer.position.set(this.flipped ? maxX : -minX, -minY);
+    const layout = worldLayerTransform(minX, maxX, minY, this.flipped);
+    worldLayer.scale.set(layout.scaleX, layout.scaleY);
+    worldLayer.position.set(layout.x, layout.y);
     this.viewport.addChild(worldLayer);
 
     // Assety/tilesety PixelLab MUSZĄ być załadowane PRZED budową terenu/budynków/dekoracji.
@@ -227,7 +229,7 @@ export class GameView {
     for (const def of this.theme.buildings) {
       const label = buildingText(this.theme.id, def.id, this.lang).label;
       const node = buildBuilding(def, this.theme, projection, label);
-      if (this.flipped) this.flipTextNodes(node);
+      if (this.flipped) flipTextNodes(node);
       node.eventMode = 'static';
       node.cursor = 'pointer';
       node.on('pointertap', () => useWorld.getState().selectBuilding(def.id));
@@ -348,17 +350,16 @@ export class GameView {
   }
 
   private worldToViewport(sx: number, sy: number): { x: number; y: number } {
-    return {
-      x: this.worldLayer.position.x + this.worldLayer.scale.x * sx,
-      y: this.worldLayer.position.y + this.worldLayer.scale.y * sy,
-    };
-  }
-
-  private flipTextNodes(node: Container): void {
-    for (const child of node.children) {
-      if (child instanceof Text) child.scale.x = -1;
-      else this.flipTextNodes(child as Container);
-    }
+    return worldToViewport(
+      {
+        x: this.worldLayer.position.x,
+        y: this.worldLayer.position.y,
+        scaleX: this.worldLayer.scale.x,
+        scaleY: this.worldLayer.scale.y,
+      },
+      sx,
+      sy,
+    );
   }
 
   /** Mnożnik zoomu (kontrolki HUD +/−). Trzymany w granicach clampZoom (cover … MAX_ZOOM). */
@@ -458,7 +459,7 @@ export class GameView {
         unit.container.on('pointertap', () => useWorld.getState().select(sessionId));
         this.units.set(hero.sessionId, unit);
         this.unitLayer.addChild(unit.container);
-        if (this.flipped) this.flipTextNodes(unit.container);
+        if (this.flipped) flipTextNodes(unit.container);
         // Zapamiętaj budynek „domowy" — w przeciwnym razie idle/thinking
         // bohaterowie wracają do Twierdzy (fallback w steer/wanderIdle) i stoi
         // ich w piazza. Z domem pamiętanym wracają pod właściwy punkt zbiórki.
@@ -486,7 +487,7 @@ export class GameView {
         unit.container.on('pointertap', () => useWorld.getState().select(parentId));
         this.units.set(peon.agentId, unit);
         this.unitLayer.addChild(unit.container);
-        if (this.flipped) this.flipTextNodes(unit.container);
+        if (this.flipped) flipTextNodes(unit.container);
       }
       unit.setState(peon.state, peon.currentTool);
       this.steer(unit, peon.state, peon.currentTool, undefined, 0);

@@ -125,6 +125,7 @@ export function ThemeSwitch() {
         className="ghost"
         style={flipped ? { background: '#3b3b35' } : undefined}
         onClick={() => setFlipped(!flipped)}
+        title={t.flipCity}
         aria-label={t.flipCity}
         aria-pressed={flipped}
       >

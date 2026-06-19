@@ -394,7 +394,7 @@ const IT: UiStrings = {
   agents: 'agenti',
   allCities: 'Tutte',
   language: 'Lingua',
-  flipCity: 'Ribalta la citta in orizzontale',
+  flipCity: 'Ribalta la città in orizzontale',
   symbols: 'Simboli',
   edges: 'Archi',
   communities: 'Comunità',
