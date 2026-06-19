@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { WS_PATH, type GameEvent } from '@agent-citadel/shared';
 import { World } from './world.js';
 import { registerMappingRoutes } from './mapping-routes.js';
+import { registerModelRoutes } from './model-routes.js';
 import { OpenCodePoller } from './sources/opencode-poller.js';
 import { ArsenalPoller } from './arsenal/arsenal-poller.js';
 
@@ -36,6 +37,7 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     app.get('/building-stats', async () => ({ updatedAt: new Date().toISOString(), buildings: {} }));
     // Mapa narzędzie→budynek: w demo nie persystujemy (PUT tylko waliduje, GET = domyślna).
     registerMappingRoutes(app, { persist: false });
+    registerModelRoutes(app, { persist: false });
   } else {
     const { SourceWatcher } = await import('./watcher.js');
     const { SOURCES } = await import('./sources/index.js');
@@ -52,6 +54,7 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     // Mapa narzędzie→budynek: lokalny serwer = źródło prawdy (plik na dysku usera);
     // zapis invaliduje cache statystyk, by liczby nadążały za nową mapą.
     registerMappingRoutes(app, { persist: true, onSaved: invalidateBuildingStatsCache });
+    registerModelRoutes(app, { persist: true });
     app.post('/hooks', async (request) => {
       const translated = translateHook((request.body ?? {}) as never);
       if (translated) claudeWatcher.applyExternalFacts(translated.sessionId, translated.projectDir, translated.facts);
