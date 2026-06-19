@@ -8,6 +8,7 @@ import { WaypointGraph } from './pathfind';
 import { buildBuilding, drawRoads, drawTerrain, TEAM_COLORS } from './placeholders';
 import { Unit } from './unit';
 import { getHeroSheet, getPeonSheet, loadThemeSprites } from './sprites';
+import { loadEmblems } from './emblems';
 import { sessionToArchetypeKey } from './archetype';
 import { resolveModelLive } from '../model-store';
 import { loadTilemaps, hasTilemaps, buildTilemap } from './tilemap';
@@ -208,6 +209,7 @@ export class GameView {
     // a przy zmianie motywu scena buduje się ze starym (jeszcze niewyczyszczonym) cache.
     await Promise.all([
       loadThemeSprites(this.theme.id),
+      loadEmblems(), // herby providerów — theme-agnostic, idempotentne
       loadBuildingSprites(this.theme.id),
       loadDecorationSprites(this.theme.id),
       this.theme.style === 'topdown' ? loadTilemaps(this.theme.id) : loadIsoTiles(this.theme.id),

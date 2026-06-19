@@ -1,5 +1,6 @@
-import { AnimatedSprite, Container, Graphics, Text, type Spritesheet } from 'pixi.js';
+import { AnimatedSprite, Container, Graphics, Sprite, Text, type Spritesheet } from 'pixi.js';
 import { resolveProvider, type AgentKind, type HeroStateKind } from '@agent-citadel/shared';
+import { getEmblemTexture } from './emblems';
 import type { Projection } from './projection';
 import type { PathNode } from './pathfind';
 import { buildUnitBody, labelStyle, teamColor } from './placeholders';
@@ -234,13 +235,26 @@ function clip(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
-/** Mała odznaka pochodzenia agenta (tylko nie-Claude). Rysowana proceduralnie — bez assetów.
- *  Dane (kolor/litera) z AGENT_PROVIDERS (shared); kolor CSS '#rrggbb' → liczba Pixi. */
+/** Odznaka pochodzenia agenta przy głowie jednostki. Warstwa podstawowa: graficzny herb
+ *  (tekstura z loadEmblems). Brak tekstury → fallback proceduralny: kółko + litera z
+ *  AGENT_PROVIDERS (tylko nie-Claude; kolor CSS '#rrggbb' → liczba Pixi). */
 function buildAgentBadge(agent: AgentKind): Container | undefined {
   const provider = resolveProvider(agent);
-  if (provider.color === null) return undefined; // Claude / nieznany → bez odznaki
-
   const c = new Container();
+  c.position.set(10, -30); // przy głowie, prawy-górny róg jednostki
+
+  const tex = getEmblemTexture(provider.kind);
+  if (tex) {
+    const sprite = new Sprite(tex);
+    sprite.anchor.set(0.5);
+    sprite.width = 22;
+    sprite.height = 22;
+    c.addChild(sprite);
+    return c;
+  }
+
+  // Fallback proceduralny — tylko nie-Claude (Claude: color null → bez odznaki).
+  if (provider.color === null) return undefined;
   const g = new Graphics();
   const color = parseInt(provider.color.slice(1), 16);
   g.circle(0, 0, 7).fill({ color }).stroke({ color: 0x0b0b0a, width: 1.5 });
@@ -250,6 +264,5 @@ function buildAgentBadge(agent: AgentKind): Container | undefined {
   letter.anchor.set(0.5);
   c.addChild(letter);
 
-  c.position.set(10, -30); // przy głowie, prawy-górny róg jednostki
   return c;
 }
