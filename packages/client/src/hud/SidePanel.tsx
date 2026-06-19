@@ -5,6 +5,7 @@ import { useMapping } from '../mapping-store';
 import { useModels } from '../model-store';
 import { resolveSprite, resolveContextWindow } from '../theme/models';
 import { ProviderEmblem } from './ProviderEmblem';
+import { containerLabel } from './container-badge';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
 import { teamColorHex } from '../game/placeholders';
@@ -118,6 +119,15 @@ export function SidePanel() {
               {hero.gitBranch ? ` · ⎇ ${hero.gitBranch}` : ''}
               {hero.permissionMode ? ` · ${hero.permissionMode}` : ''}
             </div>
+            {hero.container && (
+              <div
+                className="px"
+                title={hero.container.id}
+                style={{ fontSize: 11, marginTop: 3, color: '#7fc7e8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+              >
+                {containerLabel(hero.container)}
+              </div>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flex: 'none' }}>
