@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { resolveBuilding, type AgentKind, type BuildingId, type HeroStateKind, type TranscriptLine } from '@agent-citadel/shared';
+import { resolveBuilding, type BuildingId, type HeroStateKind, type TranscriptLine } from '@agent-citadel/shared';
 import { useWorld } from '../store';
 import { useMapping } from '../mapping-store';
 import { useModels } from '../model-store';
 import { resolveSprite, resolveContextWindow } from '../theme/models';
+import { ProviderEmblem } from './ProviderEmblem';
 import { useSettings } from '../settings';
 import { useUi, buildingText } from '../i18n';
 import { teamColorHex } from '../game/placeholders';
@@ -48,14 +49,6 @@ const BUILDING_EMOJI: Record<BuildingId, string> = {
   hydroponics: '🌱',
   lounge: '🛋',
   medbay: '⚕️',
-};
-
-/** Etykieta + kolor odznaki agenta w panelu. */
-const AGENT_BADGE: Record<AgentKind, { label: string; color: string } | undefined> = {
-  claude: undefined, // domyślny agent — bez odznaki, żeby nie zaśmiecać
-  codex: { label: 'Codex', color: '#10a37f' },
-  opencode: { label: 'OpenCode', color: '#f59e0b' }, // amber-500
-  koda: { label: 'Koda', color: '#8b5cf6' }, // violet-500
 };
 
 /** Panel wybranej sesji: karta pionka (stan, statystyki, zadanie, ostatnie akcje) + transkrypt. */
@@ -119,17 +112,7 @@ export function SidePanel() {
           <span style={{ width: 14, height: 14, borderRadius: '50%', background: teamColorHex(hero.teamColor), border: '1px solid rgba(0,0,0,.4)', marginTop: 3, flex: 'none' }} />
           <div style={{ minWidth: 0 }}>
             <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{hero.title}</strong>
-            {(() => {
-              const badge = AGENT_BADGE[hero.agent ?? 'claude'];
-              return badge ? (
-                <span
-                  className="px"
-                  style={{ marginLeft: 6, fontSize: 10, padding: '1px 6px', borderRadius: 4, background: `${badge.color}33`, color: badge.color, border: `1px solid ${badge.color}66`, verticalAlign: 'middle' }}
-                >
-                  {badge.label}
-                </span>
-              ) : null;
-            })()}
+            <ProviderEmblem agent={hero.agent} variant="pill" />
             <div style={{ fontSize: 11, opacity: 0.6, marginTop: 2 }}>
               {resolveSprite(hero.model, models).displayName ?? hero.model ?? t.modelUnknown}
               {hero.gitBranch ? ` · ⎇ ${hero.gitBranch}` : ''}

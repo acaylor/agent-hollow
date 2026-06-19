@@ -1,8 +1,45 @@
 # Next steps: „Herby" providerów (emblemat AgentKind na sprite'cie)
 
 Data: 2026-06-19
-Status: **pomysł / next steps** (NIE zaczęte) — wymaga osobnego brainstormu → spec → plan
+Status: **✅ ZREALIZOWANE (MVP, 2026-06-19)** — konsolidacja + domknięcie braku. Patrz „Zrealizowane" niżej.
 Kontekst bazowy: [[2026-06-19-model-registry-sprite-cards-design.md]], [[2026-06-19-model-registry-settings-design.md]]
+
+## Zrealizowane (2026-06-19) — konsolidacja heraldyki
+
+Zwiad po kodzie pokazał, że rekomendowane MVP (B) **już istniało** rozsiane w 3 kopiach
+(`unit.ts` kolory+litery, `SidePanel` etykiety, `ProjectSwitcher` litery) z drobnymi
+niespójnościami. Realnym zadaniem była **konsolidacja do jednego źródła prawdy** +
+domknięcie jedynej brakującej powierzchni („Widziane modele").
+
+**Co powstało:**
+- `packages/shared/src/providers.ts` — jedyna definicja agent→herb: `interface ProviderInfo`
+  (`kind`, `label`, `labelShort`, `color: string | null`), `const AGENT_PROVIDERS`,
+  `resolveProvider(agent)` (nieznany/undefined → claude = brak herba). Kolory 1:1 z dawnymi.
+  Bez `validate*`/route'ów/store'a (read-only metadata, nie konfig). Eksport z `index.ts`.
+- `packages/client/src/theme/providers.ts` — barrel re-eksportujący z shared (bliźniak `theme/mapping.ts`/`theme/models.ts`).
+- `packages/client/src/hud/ProviderEmblem.tsx` — adapter React, warianty `pill` (SidePanel)
+  i `chip` (ProjectSwitcher + „Widziane modele"); zwraca `null` dla `color===null`.
+- `unit.ts` — `buildAgentBadge` czyta `resolveProvider`; kolor CSS `'#rrggbb'` → liczba Pixi
+  przez `parseInt(color.slice(1),16)`. Usunięto `AGENT_BADGE_COLORS`.
+- `packages/client/src/hud/seen-models.ts` — czysty `seenModelsByAgent(heroes)`:
+  `Map<model, Set<AgentKind>>` zachowujący kolejność; zastąpił inline'owy `seen` memo, który gubił `agent`.
+- `ModelRegistryEditor` — „Widziane modele" pokazują herby providerów per model (jedyna nowa funkcja UI).
+- Usunięto wszystkie 3 kopie `AGENT_BADGE` (grep daje zero).
+
+**Decyzje (rozstrzygnięte w brainstormie):**
+- Lokalizacja: `shared` (idiom obok `resolveBuilding`/`resolveModel`). Etykiety: stałe w tablicy
+  (nazwy marek, nie i18n). Wiele herbów per model: tak (zbiór). Nieznany provider: degraduje do
+  claude=brak herba (bez 5. stanu). Claude: celowo bez herba.
+
+**Testy/weryfikacja:** `resolve-provider.test.ts` (7) + `seen-models.test.ts` (5), TDD od RED;
+pełny zestaw 312 (114 serwer + 198 klient) zielony; `tsc --noEmit` + `vite build` czyste.
+Inspekcja na żywo: herb OpenCode (`#f59e0b`, „O", 14×14, tooltip „OpenCode") renderuje się przy
+`glm-52-nvfp4` w „Widzianych modelach"; modele Claude bez herba; brak błędów w konsoli.
+
+**Poza MVP (nadal next steps):** emblematy graficzne per motyw (Faza 2) — patrz „Kierunek (A)" niżej.
+
+---
+
 
 ## Pomysł (jednym zdaniem)
 

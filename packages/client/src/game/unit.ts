@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, Text, type Spritesheet } from 'pixi.js';
-import type { AgentKind, HeroStateKind } from '@agent-citadel/shared';
+import { resolveProvider, type AgentKind, type HeroStateKind } from '@agent-citadel/shared';
 import type { Projection } from './projection';
 import type { PathNode } from './pathfind';
 import { buildUnitBody, labelStyle, teamColor } from './placeholders';
@@ -13,14 +13,6 @@ const BUBBLE_TTL = 7;
 const SPRITE_SCALE = 0.8;
 /** Domyślna kotwica Y stopy (fantasy/standard: wiersz 57-59/68 → 0.87). Nadpisywana per motyw. */
 const SPRITE_FOOT_ANCHOR = 0.87;
-/** Kolory odznak agentów (Claude nie dostaje odznaki). */
-const AGENT_BADGE_COLORS: Record<AgentKind, number | undefined> = {
-  claude: undefined,
-  codex: 0x10a37f, // zielony OpenAI
-  opencode: 0xf59e0b, // amber-500
-  koda: 0x8b5cf6, // violet-500
-};
-
 /**
  * Jednostka na mapie (bohater lub peon): pozycja na siatce logicznej,
  * ruch po waypointach, nakładki stanów (aura, wykrzyknik, dym, zzz)
@@ -242,22 +234,22 @@ function clip(text: string, max: number): string {
   return text.length > max ? `${text.slice(0, max - 1)}…` : text;
 }
 
-/** Mała odznaka pochodzenia agenta (tylko nie-Claude). Rysowana proceduralnie — bez assetów. */
+/** Mała odznaka pochodzenia agenta (tylko nie-Claude). Rysowana proceduralnie — bez assetów.
+ *  Dane (kolor/litera) z AGENT_PROVIDERS (shared); kolor CSS '#rrggbb' → liczba Pixi. */
 function buildAgentBadge(agent: AgentKind): Container | undefined {
-  const color = AGENT_BADGE_COLORS[agent];
-  if (!color) return undefined;
-  
+  const provider = resolveProvider(agent);
+  if (provider.color === null) return undefined; // Claude / nieznany → bez odznaki
+
   const c = new Container();
   const g = new Graphics();
+  const color = parseInt(provider.color.slice(1), 16);
   g.circle(0, 0, 7).fill({ color }).stroke({ color: 0x0b0b0a, width: 1.5 });
   c.addChild(g);
-  
-  // Litera per agent
-  const letterText = agent === 'codex' ? 'C' : agent === 'opencode' ? 'O' : agent === 'koda' ? 'K' : '?';
-  const letter = new Text({ text: letterText, style: { ...labelStyle, fontSize: 9, fill: 0xffffff } });
+
+  const letter = new Text({ text: provider.labelShort, style: { ...labelStyle, fontSize: 9, fill: 0xffffff } });
   letter.anchor.set(0.5);
   c.addChild(letter);
-  
+
   c.position.set(10, -30); // przy głowie, prawy-górny róg jednostki
   return c;
 }

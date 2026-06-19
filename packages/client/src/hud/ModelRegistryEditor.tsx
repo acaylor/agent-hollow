@@ -15,6 +15,8 @@ import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi, type UiStrings } from '../i18n';
 import { parseUploadedModelConfig, downloadModelConfig } from './model-io';
+import { ProviderEmblem } from './ProviderEmblem';
+import { seenModelsByAgent } from './seen-models';
 import {
   groupBySprite,
   addSpriteModel,
@@ -60,12 +62,8 @@ export function ModelRegistryEditor() {
   const themeId = useSettings((s) => s.themeId);
   const t = useUi();
 
-  // Odrębne modele widziane w bieżących sesjach.
-  const seen = useMemo(() => {
-    const set = new Set<string>();
-    for (const h of Object.values(heroes)) if (h.model) set.add(h.model);
-    return [...set];
-  }, [heroes]);
+  // Odrębne modele widziane w bieżących sesjach + providerzy, pod którymi je uruchamiano.
+  const seen = useMemo(() => seenModelsByAgent(Object.values(heroes)), [heroes]);
 
   const groups = useMemo(() => groupBySprite(models), [models]);
   const setWindows = (windows: WindowRule[]) => setModels({ ...models, windows });
@@ -80,16 +78,19 @@ export function ModelRegistryEditor() {
           <span className="px" style={{ opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: 11 }}>
             {t.seenModels}
           </span>
-          {seen.map((m) => {
+          {seen.map(({ model, agents }) => {
             const matched =
-              models.sprites.some((r) => matchModel(m, r.match)) ||
-              models.windows.some((r) => matchModel(m, r.match));
+              models.sprites.some((r) => matchModel(model, r.match)) ||
+              models.windows.some((r) => matchModel(model, r.match));
             return (
-              <div key={m} style={{ display: 'flex', gap: 8, fontSize: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                <SpriteThumb themeId={themeId} sprite={resolveSprite(m, models).sprite} size={28} />
-                <code style={{ opacity: 0.9 }}>{m}</code>
-                <span className="bre-chip bre-chip--exact">{resolveSprite(m, models).sprite}</span>
-                <span className="bre-chip bre-chip--prefix">{formatK(resolveContextWindow(m, models))}</span>
+              <div key={model} style={{ display: 'flex', gap: 8, fontSize: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                <SpriteThumb themeId={themeId} sprite={resolveSprite(model, models).sprite} size={28} />
+                <code style={{ opacity: 0.9 }}>{model}</code>
+                <span className="bre-chip bre-chip--exact">{resolveSprite(model, models).sprite}</span>
+                <span className="bre-chip bre-chip--prefix">{formatK(resolveContextWindow(model, models))}</span>
+                {agents.map((a) => (
+                  <ProviderEmblem key={a} agent={a} variant="chip" />
+                ))}
                 {!matched && <span style={{ color: '#ef9f27' }}>⚠ {t.usesFallback}</span>}
               </div>
             );

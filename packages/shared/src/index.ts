@@ -1,5 +1,6 @@
 import type { ProjectArsenal, WieldedArsenal } from './arsenal.js';
 export * from './arsenal.js';
+export * from './providers.js';
 
 /** Protokół WebSocket Agent Citadel — wspólne typy serwera i klienta. */
 
