@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { World } from '../src/world.js';
 import { SessionTracker } from '../src/state-machine.js';
 import { DockerPoller } from '../src/sources/docker-poller.js';
@@ -81,6 +81,18 @@ const endLine =
   }) + '\n';
 
 describe('DockerPoller', () => {
+  // Fixtury mają stałe timestampy, a sweep() pollera ewikuje bohaterów względem
+  // realnego Date.now() (removeAfterMs = 30 min). Bez zamrożenia zegara testy byłyby
+  // „time-bombą": zielone w dniu commita, czerwone po 30 min od czasu fixture'ów.
+  // Zamrażamy czas tuż po najpóźniejszym fixturze (10:00:05) → ewikcja deterministyczna.
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-06-20T10:00:10.000Z'));
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('odkrywa agentowy kontener i rodzi bohatera z polem container + tytułem z promptu', async () => {
     const world = new World();
     const client = new FakeDockerClient(true, [{ id: 'abc123', name: 'devbox', image: 'node:20' }], {
