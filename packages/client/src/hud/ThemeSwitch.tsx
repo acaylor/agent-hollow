@@ -64,6 +64,20 @@ export function ThemeSwitch() {
 
   return (
     <div className="hud-panel" style={{ top: 12, left: 12, padding: 6, display: 'flex', gap: 6 }}>
+      {/* Collapse the WHOLE toolbar to a compact handle so it never stretches the
+          top edge; state is remembered across reloads (default collapsed). */}
+      <button
+        className="ghost"
+        onClick={() => setBarCollapsed(!barCollapsed)}
+        title={t.agentControls}
+        aria-label={t.agentControls}
+        aria-expanded={!barCollapsed}
+        style={{ display: 'inline-flex', alignItems: 'center' }}
+      >
+        {barCollapsed ? '☰' : '◂'}
+      </button>
+      {!barCollapsed && (
+        <>
       <button
         className="ghost"
         style={themeId === 'fantasy' ? { background: '#3b3b35' } : undefined}
@@ -78,26 +92,9 @@ export function ThemeSwitch() {
       >
         🛰️ {t.scifi}
       </button>
-      {/* Agent-control cluster (hooks / panel answering / launch) — collapsible so
-          the top bar stays compact; remembered across reloads. */}
-      <button
-        className="ghost"
-        onClick={() => setBarCollapsed(!barCollapsed)}
-        title={t.agentControls}
-        aria-label={t.agentControls}
-        aria-expanded={!barCollapsed}
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}
-      >
-        🤖
-        <span aria-hidden style={{ fontSize: 9 }}>{barCollapsed ? '▸' : '◂'}</span>
-      </button>
-      {!barCollapsed && (
-        <>
-          <HooksPanel />
-          <PanelControlToggle />
-          <LaunchAgentButton />
-        </>
-      )}
+      <HooksPanel />
+      <PanelControlToggle />
+      <LaunchAgentButton />
 
       {/* Language as dropdown instead of a cycling button. */}
       <div ref={langRef} style={{ position: 'relative' }}>
@@ -168,6 +165,8 @@ export function ThemeSwitch() {
       >
         ⚙
       </button>
+        </>
+      )}
       {settingsOpen && (
         <SettingsPanel
           onClose={() => {
