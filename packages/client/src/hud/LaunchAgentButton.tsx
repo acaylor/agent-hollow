@@ -11,7 +11,10 @@ export function LaunchAgentButton() {
   if (!available) return null; // hide when the SDK isn't installed
   return (
     <>
-      <button className="ghost" onClick={() => setOpen(true)} title={t.launchAgent}>🚀 {t.launchAgent}</button>
+      <button className="ghost" onClick={() => setOpen(true)} title={t.launchAgent}>
+        🚀 {t.launchAgent}
+        <span style={{ fontSize: 9, fontWeight: 700, color: '#0c0c0c', background: '#f0c995', padding: '0 4px', borderRadius: 3, marginLeft: 4 }}>BETA</span>
+      </button>
       {open && <LaunchAgentDialog onClose={() => setOpen(false)} />}
     </>
   );

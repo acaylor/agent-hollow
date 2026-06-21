@@ -4,6 +4,9 @@ import { useUi } from '../i18n';
 import { launchAgent, listDirs, recentDirs, sessionsStatus } from '../sessions';
 import { useWorld } from '../store';
 
+/** BETA setup instructions (token auth) on GitHub. */
+const LAUNCH_DOCS_URL = 'https://github.com/agentsmill/age-of-agents/blob/main/docs/launch-agent.md';
+
 export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
   const t = useUi();
   const [available, setAvailable] = useState<boolean | null>(null);
@@ -34,12 +37,17 @@ export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#0008', display: 'grid', placeItems: 'center', zIndex: 50 }} onClick={onClose}>
       <div className="hud-panel" style={{ width: 460, maxWidth: '90vw', padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }} onClick={(e) => e.stopPropagation()}>
-        <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{t.launchTitle}</strong>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{t.launchTitle}</strong>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#0c0c0c', background: '#f0c995', padding: '1px 5px', borderRadius: 3 }}>BETA</span>
+          <a href={LAUNCH_DOCS_URL} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', fontSize: 11, color: '#7fc7e8' }}>{t.launchSetupGuide} ↗</a>
+        </div>
         {available === false && <div style={{ color: '#f09595', fontSize: 12 }}>{t.launchUnavailable}</div>}
         {available !== false && !authConfigured && (
           <div style={{ color: '#f0c995', fontSize: 12, lineHeight: 1.5 }}>
             ⚠️ {t.launchAuthWarning}
             <pre style={{ margin: '4px 0 0', fontSize: 11, whiteSpace: 'pre-wrap', opacity: 0.85 }}>claude setup-token{'\n'}export CLAUDE_CODE_OAUTH_TOKEN=…</pre>
+            <a href={LAUNCH_DOCS_URL} target="_blank" rel="noreferrer" style={{ fontSize: 11, color: '#7fc7e8' }}>{t.launchSetupGuide} ↗</a>
           </div>
         )}
         <div style={{ fontSize: 11, opacity: 0.7 }}>{t.launchCostWarning}</div>
