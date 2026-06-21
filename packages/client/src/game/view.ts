@@ -460,6 +460,7 @@ export class GameView {
         const door = { gx: home.door.gx + o.dx, gy: home.door.gy + o.dy };
         const sheet = getHeroSheet(sessionToArchetypeKey(hero, resolveModelLive(hero.model).sprite));
         unit = new Unit(hero.sessionId, hero.teamColor, false, clipName(hero.title), door, this.theme.projection, sheet, hero.agent ?? 'claude', this.theme.heroSprite.scale, this.theme.heroSprite.footAnchor);
+        unit.setScreenFlipped(this.flipped);
         unit.container.eventMode = 'static';
         unit.container.cursor = 'pointer';
         const sessionId = hero.sessionId;
@@ -495,6 +496,7 @@ export class GameView {
         const o = peonSpawnScatter(peon.agentId);
         const start = { gx: door.gx + o.dx, gy: door.gy + o.dy };
         unit = new Unit(peon.agentId, this.parentColor(peon, heroes), true, clipName(peon.description ?? 'peon', 22), start, this.theme.projection, getPeonSheet());
+        unit.setScreenFlipped(this.flipped);
         unit.container.eventMode = 'static';
         unit.container.cursor = 'pointer';
         const parentId = peon.parentSessionId;
