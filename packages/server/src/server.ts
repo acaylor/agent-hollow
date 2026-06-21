@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import { WebSocketServer, WebSocket } from 'ws';
-import { WS_PATH, type GameEvent } from '@agent-citadel/shared';
+import { WS_PATH, type GameEvent, validateQuestionAnswer } from '@agent-citadel/shared';
 import { World } from './world.js';
 import { registerMappingRoutes } from './mapping-routes.js';
 import { registerModelRoutes } from './model-routes.js';
@@ -9,6 +9,8 @@ import { DockerPoller } from './sources/docker-poller.js';
 import { CliDockerClient } from './sources/docker-client.js';
 import { ArsenalPoller } from './arsenal/arsenal-poller.js';
 import type { SourceWatcher } from './watcher.js';
+import { PendingRegistry } from './pending-registry.js';
+import { registerPermissionPolicyRoutes } from './permission-policy-routes.js';
 
 export interface StartServerOptions {
   /** HTTP port. Pass 0 so the system picks a free one (useful in tests). */
@@ -18,6 +20,8 @@ export interface StartServerOptions {
   demo: boolean;
   /** Katalog ze zbudowanym klientem (dist/web). Gdy podany — serwer serwuje SPA. */
   webRoot?: string;
+  /** Override permission-policy file path (tests). Defaults to ~/.age-of-agents. */
+  policyPath?: string;
 }
 
 export interface RunningServer {
@@ -30,6 +34,7 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
   const host = opts.host ?? '127.0.0.1';
   const app = Fastify({ logger: { level: 'info' } });
   const world = new World();
+  const pendingRegistry = new PendingRegistry(world);
   let watchers: SourceWatcher[] = [];
   let opencodePoller: OpenCodePoller | undefined;
   let dockerPoller: DockerPoller | undefined;
@@ -45,10 +50,12 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     // Tool->building map: demo does not persist (PUT only validates, GET = default).
     registerMappingRoutes(app, { persist: false });
     registerModelRoutes(app, { persist: false });
+    app.post('/hooks/decide', async () => ({}));
+    registerPermissionPolicyRoutes(app, { persist: false });
   } else {
     const { SourceWatcher } = await import('./watcher.js');
     const { activeSources } = await import('./sources/index.js');
-    const { translateHook, hooksStatus, installHooks, uninstallHooks } = await import('./hooks.js');
+    const { translateHook, hooksStatus, installHooks, uninstallHooks, DECIDE_TIMEOUT_SEC } = await import('./hooks.js');
     const { getBuildingStats, invalidateBuildingStatsCache } = await import('./building-stats.js');
     const sources = activeSources(process.env.AOA_SOURCES);
     watchers = sources.map((source) => new SourceWatcher(world, source));
@@ -67,6 +74,25 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     // saving invalidates stats cache so numbers keep up with the new map.
     registerMappingRoutes(app, { persist: true, onSaved: invalidateBuildingStatsCache });
     registerModelRoutes(app, { persist: true });
+    const { decideHook } = await import('./hook-decide.js');
+    const { loadPermissionPolicy, addPolicyRule } = await import('./permission-policy.js');
+    registerPermissionPolicyRoutes(app, { persist: true, policyPath: opts.policyPath });
+
+    app.post('/hooks/decide', async (request) => {
+      const body = (request.body ?? {}) as never;
+      // Animate the tool like the regular /hooks channel does.
+      const translated = translateHook(body);
+      if (translated && claudeWatcher) {
+        claudeWatcher.applyExternalFacts(translated.sessionId, translated.projectDir, translated.facts, translated.cwd);
+      }
+      const policy = await loadPermissionPolicy(opts.policyPath);
+      return decideHook(body, {
+        policy,
+        registry: pendingRegistry,
+        timeoutMs: (DECIDE_TIMEOUT_SEC - 10) * 1000,
+        onAlwaysRule: async (rule) => { await addPolicyRule(rule, opts.policyPath); },
+      });
+    });
     app.post('/hooks', async (request, reply) => {
       const translated = translateHook((request.body ?? {}) as never);
       if (translated) {
@@ -129,6 +155,18 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
 
   wss.on('connection', (socket) => {
     send(socket, { type: 'snapshot', ...world.snapshot() });
+    for (const q of pendingRegistry.open()) send(socket, { type: 'pending-question', question: q });
+    socket.on('message', (data) => {
+      try {
+        const msg = JSON.parse(String(data)) as { type?: string; payload?: unknown };
+        if (msg.type === 'answer') {
+          const res = validateQuestionAnswer(msg.payload);
+          if (res.ok) pendingRegistry.resolve(res.answer);
+        }
+      } catch {
+        /* ignore malformed client messages */
+      }
+    });
   });
   const offEvent = world.onEvent((event) => {
     for (const socket of wss.clients) send(socket, event);
