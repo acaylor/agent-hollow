@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useSettings, type Lang } from '../settings';
 import { useUi } from '../i18n';
 import { HooksPanel } from './HooksPanel';
+import { PanelControlToggle } from './PanelControlToggle';
 import { SettingsPanel } from './SettingsPanel';
 import { useMenuKeyboard } from './useMenuKeyboard';
 
@@ -75,6 +76,7 @@ export function ThemeSwitch() {
         🛰️ {t.scifi}
       </button>
       <HooksPanel />
+      <PanelControlToggle />
 
       {/* Language as dropdown instead of a cycling button. */}
       <div ref={langRef} style={{ position: 'relative' }}>

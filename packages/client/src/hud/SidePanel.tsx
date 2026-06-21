@@ -13,6 +13,7 @@ import { getGameView } from '../game/view';
 import { clip, formatK, relTime } from '../util';
 import { StatTile } from './StatTile';
 import { ContextBar } from './ContextBar';
+import { PendingQuestionCard } from './PendingQuestionCard';
 
 // Stable reference: a selector returning fresh [] on every call would put
 // useSyncExternalStore into an infinite render loop.
@@ -172,6 +173,8 @@ export function SidePanel() {
           {destination ? <span style={{ opacity: 0.6 }}> → {destination}</span> : null}
         </span>
       </div>
+
+      <PendingQuestionCard sessionId={selected} />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
         <StatTile label={t.produced} value={formatK(hero.tokens.output)} />
