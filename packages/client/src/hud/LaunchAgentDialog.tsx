@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { SDK_PERMISSION_MODES, type SdkPermissionMode } from '@agent-citadel/shared';
 import { useUi } from '../i18n';
-import { launchAgent, listDirs, recentDirs, sdkAvailable } from '../sessions';
+import { launchAgent, listDirs, recentDirs, sessionsStatus } from '../sessions';
 import { useWorld } from '../store';
 
 export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
   const t = useUi();
   const [available, setAvailable] = useState<boolean | null>(null);
+  const [authConfigured, setAuthConfigured] = useState(true);
   const [cwd, setCwd] = useState('');
   const [prompt, setPrompt] = useState('');
   const [model, setModel] = useState('');
@@ -15,7 +16,7 @@ export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [browse, setBrowse] = useState<{ dir: string; parent: string | null; entries: { name: string; path: string }[] } | null>(null);
 
-  useEffect(() => { void sdkAvailable().then(setAvailable); }, []);
+  useEffect(() => { void sessionsStatus().then((s) => { setAvailable(s.available); setAuthConfigured(s.authConfigured); }); }, []);
   useEffect(() => { void listDirs(cwd || undefined).then(setBrowse).catch(() => setBrowse(null)); }, [cwd]);
 
   const submit = async () => {
@@ -35,6 +36,12 @@ export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
       <div className="hud-panel" style={{ width: 460, maxWidth: '90vw', padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }} onClick={(e) => e.stopPropagation()}>
         <strong className="px" style={{ fontSize: 15, color: '#fac775' }}>{t.launchTitle}</strong>
         {available === false && <div style={{ color: '#f09595', fontSize: 12 }}>{t.launchUnavailable}</div>}
+        {available !== false && !authConfigured && (
+          <div style={{ color: '#f0c995', fontSize: 12, lineHeight: 1.5 }}>
+            ⚠️ {t.launchAuthWarning}
+            <pre style={{ margin: '4px 0 0', fontSize: 11, whiteSpace: 'pre-wrap', opacity: 0.85 }}>claude setup-token{'\n'}export CLAUDE_CODE_OAUTH_TOKEN=…</pre>
+          </div>
+        )}
         <div style={{ fontSize: 11, opacity: 0.7 }}>{t.launchCostWarning}</div>
 
         <label style={{ fontSize: 12 }}>{t.launchFolder}

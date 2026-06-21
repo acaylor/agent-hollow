@@ -28,6 +28,18 @@ export async function sdkAvailable(): Promise<boolean> {
   try { const r = await fetch('/sessions'); return (await r.json()).available === true; } catch { return false; }
 }
 
+/** SDK install + auth status for the launch dialog. `authConfigured` is false when
+ *  the server has no CLAUDE_CODE_OAUTH_TOKEN / API key — launches would 401. */
+export async function sessionsStatus(): Promise<{ available: boolean; authConfigured: boolean }> {
+  try {
+    const r = await fetch('/sessions');
+    const j = await r.json();
+    return { available: j.available === true, authConfigured: j.authConfigured === true };
+  } catch {
+    return { available: false, authConfigured: false };
+  }
+}
+
 export async function listDirs(dir?: string): Promise<{ dir: string; parent: string | null; entries: { name: string; path: string }[] }> {
   const r = await fetch(`/fs/list${dir ? `?dir=${encodeURIComponent(dir)}` : ''}`);
   if (!r.ok) throw new Error('cannot list');

@@ -138,6 +138,7 @@ export interface UiStrings {
   launchCancel: string;
   launchCostWarning: string;
   launchUnavailable: string;
+  launchAuthWarning: string;
   // Question modal & SDK card actions
   pqSend: string;
   pqSendPlaceholder: string;
@@ -287,6 +288,7 @@ const EN: UiStrings = {
   launchCancel: 'Cancel',
   launchCostWarning: 'This runs a real Claude Code session — it uses your account and consumes tokens.',
   launchUnavailable: 'Claude Agent SDK not installed — run npm i @anthropic-ai/claude-agent-sdk',
+  launchAuthWarning: 'No SDK auth on the server — launches will fail (401). Generate a token and restart the app from that shell:',
   // Question modal & SDK card actions
   pqSend: 'Send',
   pqSendPlaceholder: 'Reply to the agent…',
@@ -436,6 +438,7 @@ const PL: UiStrings = {
   launchCancel: 'Anuluj',
   launchCostWarning: 'To uruchamia prawdziwą sesję Claude Code — używa Twojego konta i zużywa tokeny.',
   launchUnavailable: 'Brak Claude Agent SDK — uruchom npm i @anthropic-ai/claude-agent-sdk',
+  launchAuthWarning: 'Brak auth SDK na serwerze — launch padnie (401). Wygeneruj token i zrestartuj appkę z tego shella:',
   // Question modal & SDK card actions
   pqSend: 'Wyślij',
   pqSendPlaceholder: 'Odpowiedz agentowi…',
@@ -585,6 +588,7 @@ const IT: UiStrings = {
   launchCancel: 'Annulla',
   launchCostWarning: 'Avvia una vera sessione Claude Code — usa il tuo account e consuma token.',
   launchUnavailable: 'Claude Agent SDK non installato — esegui npm i @anthropic-ai/claude-agent-sdk',
+  launchAuthWarning: 'Nessuna auth SDK sul server — i lanci falliranno (401). Genera un token e riavvia l’app da quella shell:',
   // Question modal & SDK card actions
   pqSend: 'Invia',
   pqSendPlaceholder: "Rispondi all'agente…",
