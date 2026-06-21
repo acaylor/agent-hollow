@@ -51,19 +51,13 @@ A glanceable, second-monitor view of what your agents are quietly up to.
 
 ## 🚀 Quick start
 
-**Quick run — `npx`.** No install, and it always fetches the latest release (handy since new versions ship often):
-
-```bash
-npx age-of-agents          # watches ~/.claude, ~/.codex, ~/.opencode & ~/.koda sessions (+ Claude in local Docker containers), prints the URL
-npx age-of-agents --demo   # calm demo mode (fake sessions)
-npx age-of-agents --open   # also open the browser
-```
-
-**Regular use — `npm i -g`.** Install it globally for a faster start and the short `aoa` command. You own the updates here, so run `npm update -g age-of-agents` now and then:
+**Install — `npm i -g`.** Install it globally for the short `aoa` command; update with `npm update -g age-of-agents` when new versions ship:
 
 ```bash
 npm i -g age-of-agents
-aoa --open
+aoa            # watches ~/.claude, ~/.codex, ~/.opencode & ~/.koda sessions (+ Claude in local Docker), prints the URL
+aoa --demo     # calm demo mode (fake sessions)
+aoa --open     # also open the browser
 ```
 
 > The server binds to `127.0.0.1` only and never writes your transcripts anywhere — it just reads them locally and broadcasts game state over a local WebSocket. See [Privacy](#-privacy).
