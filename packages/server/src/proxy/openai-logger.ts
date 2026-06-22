@@ -129,6 +129,7 @@ export async function startOpenAiLoggerProxy(opts: OpenAiLoggerOptions = {}): Pr
       return;
     }
 
+    const ok = upstream.ok;
     res.writeHead(upstream.status, { 'content-type': upstream.headers.get('content-type') ?? 'application/json' });
     if (!upstream.body) {
       res.end();
@@ -150,13 +151,15 @@ export async function startOpenAiLoggerProxy(opts: OpenAiLoggerOptions = {}): Pr
       });
       node.on('end', () => {
         res.end();
-        const { content, toolCalls, usage } = accumulateSse(lines);
-        void logLine(state, { type: 'message', ts: new Date().toISOString(), role: 'assistant', content: content || undefined, tool_calls: toolCalls.length ? toolCalls : undefined })
-          .then(() => {
-            state.knownMessages += 1;
-            if (usage) return logLine(state, { type: 'usage', input: usage.prompt_tokens ?? 0, output: usage.completion_tokens ?? 0 });
-          })
-          .catch((err) => console.error('openai-logger transcript write error:', err));
+        if (ok) {
+          const { content, toolCalls, usage } = accumulateSse(lines);
+          void logLine(state, { type: 'message', ts: new Date().toISOString(), role: 'assistant', content: content || undefined, tool_calls: toolCalls.length ? toolCalls : undefined })
+            .then(() => {
+              state.knownMessages += 1;
+              if (usage) return logLine(state, { type: 'usage', input: usage.prompt_tokens ?? 0, output: usage.completion_tokens ?? 0 });
+            })
+            .catch((err) => console.error('openai-logger transcript write error:', err));
+        }
       });
       node.on('error', (err) => {
         console.error('openai-logger stream error:', err);
@@ -167,17 +170,19 @@ export async function startOpenAiLoggerProxy(opts: OpenAiLoggerOptions = {}): Pr
 
     const text = await upstream.text();
     res.end(text);
-    try {
-      const json = JSON.parse(text);
-      const message = json?.choices?.[0]?.message;
-      if (message) {
-        await logLine(state, { type: 'message', ts: new Date().toISOString(), role: message.role ?? 'assistant', content: typeof message.content === 'string' ? message.content : undefined, tool_calls: message.tool_calls });
-        state.knownMessages += 1;
+    if (ok) {
+      try {
+        const json = JSON.parse(text);
+        const message = json?.choices?.[0]?.message;
+        if (message) {
+          await logLine(state, { type: 'message', ts: new Date().toISOString(), role: message.role ?? 'assistant', content: typeof message.content === 'string' ? message.content : undefined, tool_calls: message.tool_calls });
+          state.knownMessages += 1;
+        }
+        const usage = json?.usage;
+        if (usage) await logLine(state, { type: 'usage', input: usage.prompt_tokens ?? 0, output: usage.completion_tokens ?? 0 });
+      } catch {
+        // non-JSON upstream body (e.g. an error page) — nothing to log
       }
-      const usage = json?.usage;
-      if (usage) await logLine(state, { type: 'usage', input: usage.prompt_tokens ?? 0, output: usage.completion_tokens ?? 0 });
-    } catch {
-      // non-JSON upstream body (e.g. an error page) — nothing to log
     }
   }
 
