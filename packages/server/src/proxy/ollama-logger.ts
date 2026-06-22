@@ -135,7 +135,7 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
 
     const resHeaders: Record<string, string> = {};
     upstreamRes.headers.forEach((value, key) => {
-      if (key === 'content-length' || key === 'content-encoding') return;
+      if (key === 'content-length' || key === 'content-encoding' || key === 'transfer-encoding') return;
       resHeaders[key] = value;
     });
     res.writeHead(upstreamRes.status, resHeaders);
@@ -147,7 +147,12 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
 
     // Non-chat endpoints: transparent passthrough.
     if (!(req.method === 'POST' && isChatPath(url))) {
-      Readable.fromWeb(upstreamRes.body as any).pipe(res);
+      const passthrough = Readable.fromWeb(upstreamRes.body as any);
+      passthrough.on('error', (err) => {
+        console.error('ollama-logger passthrough stream error:', err);
+        res.destroy(err as Error);
+      });
+      passthrough.pipe(res);
       return;
     }
 
@@ -190,7 +195,8 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
                 knownMessages += 1;
                 return logLine({ type: 'usage', input: Number(evt.prompt_eval_count ?? 0), output: Number(evt.eval_count ?? 0) });
               })
-              .then(() => logLine({ type: 'turn_complete', ts: new Date().toISOString() }));
+              .then(() => logLine({ type: 'turn_complete', ts: new Date().toISOString() }))
+              .catch((err) => console.error('ollama-logger transcript write error:', err));
             assistantText = '';
             toolCalls = undefined;
           }
@@ -200,7 +206,10 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
       }
     });
     node.on('end', () => res.end());
-    node.on('error', () => res.end());
+    node.on('error', (err) => {
+      console.error('ollama-logger chat stream error:', err);
+      res.destroy(err as Error);
+    });
   }
 
   const server = createServer((req, res) => {
