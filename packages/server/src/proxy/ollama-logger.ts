@@ -30,6 +30,7 @@ export interface RunningProxy {
 type TranscriptRecord = Record<string, unknown>;
 
 const isChatPath = (url: string): boolean => url === '/api/chat' || url.startsWith('/api/chat?');
+const isGeneratePath = (url: string): boolean => url === '/api/generate' || url.startsWith('/api/generate?');
 
 /** Ollama /api/show returns model_info with an "<arch>.context_length" key. */
 export function parseOllamaContextWindow(show: unknown): number | undefined {
@@ -73,6 +74,45 @@ export function teeOllamaChat(reqMessages: any[], ndjsonLines: string[]): Transc
   }
   if (done) {
     out.push({ type: 'message', ts: new Date().toISOString(), role: 'assistant', content: assistantText || undefined, tool_calls: toolCalls });
+    out.push({ type: 'usage', input, output });
+    out.push({ type: 'turn_complete', ts: new Date().toISOString() });
+  }
+  return out;
+}
+
+/**
+ * Pure tee for /api/generate: given the request body and the upstream NDJSON lines,
+ * build transcript records. The generate path carries a single `prompt` per call (no
+ * growing message history), so no knownMessages dedup is needed.
+ */
+export function teeOllamaGenerate(reqBody: any, ndjsonLines: string[]): TranscriptRecord[] {
+  const out: TranscriptRecord[] = [];
+  const ts = new Date().toISOString();
+  if (typeof reqBody?.prompt === 'string') {
+    out.push({ type: 'message', ts, role: 'user', content: reqBody.prompt });
+  }
+  let assistantText = '';
+  let input = 0;
+  let output = 0;
+  let done = false;
+  for (const line of ndjsonLines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    let evt: any;
+    try {
+      evt = JSON.parse(trimmed);
+    } catch {
+      continue; // partial frame split across chunks; the next chunk completes it
+    }
+    if (typeof evt?.response === 'string') assistantText += evt.response;
+    if (evt?.done) {
+      done = true;
+      input = Number(evt.prompt_eval_count ?? 0);
+      output = Number(evt.eval_count ?? 0);
+    }
+  }
+  if (done) {
+    out.push({ type: 'message', ts: new Date().toISOString(), role: 'assistant', content: assistantText || undefined });
     out.push({ type: 'usage', input, output });
     out.push({ type: 'turn_complete', ts: new Date().toISOString() });
   }
@@ -145,8 +185,8 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
       return;
     }
 
-    // Non-chat endpoints: transparent passthrough.
-    if (!(req.method === 'POST' && isChatPath(url))) {
+    // Non-tee endpoints: transparent passthrough.
+    if (!(req.method === 'POST' && (isChatPath(url) || isGeneratePath(url)))) {
       const passthrough = Readable.fromWeb(upstreamRes.body as any);
       passthrough.on('error', (err) => {
         console.error('ollama-logger passthrough stream error:', err);
@@ -156,60 +196,104 @@ export async function startOllamaLoggerProxy(opts: OllamaLoggerOptions = {}): Pr
       return;
     }
 
-    // Chat endpoint: tee while streaming back to the client unchanged.
+    // Parse request body once for both tee branches.
     let reqBody: any = {};
     try {
       reqBody = body.length ? JSON.parse(body.toString('utf8')) : {};
     } catch {
       // not JSON: just pass through without logging
     }
-    const messages: any[] = Array.isArray(reqBody.messages) ? reqBody.messages : [];
+
     await ensureSession(typeof reqBody.model === 'string' ? reqBody.model : undefined);
 
-    const newMessages = messages.slice(knownMessages);
-    knownMessages = messages.length;
-    const reqTs = new Date().toISOString();
-    for (const m of newMessages) {
-      await logLine({ type: 'message', ts: reqTs, role: m?.role, content: typeof m?.content === 'string' ? m.content : undefined, tool_calls: m?.tool_calls });
-    }
+    if (isChatPath(url)) {
+      // Chat endpoint: tee while streaming back to the client unchanged.
+      const messages: any[] = Array.isArray(reqBody.messages) ? reqBody.messages : [];
 
-    let buffered = '';
-    let assistantText = '';
-    let toolCalls: any[] | undefined;
-    const node = Readable.fromWeb(upstreamRes.body as any);
-    node.on('data', (chunk: Buffer) => {
-      res.write(chunk);
-      buffered += chunk.toString('utf8');
-      let idx: number;
-      while ((idx = buffered.indexOf('\n')) >= 0) {
-        const line = buffered.slice(0, idx).trim();
-        buffered = buffered.slice(idx + 1);
-        if (!line) continue;
-        try {
-          const evt = JSON.parse(line);
-          if (typeof evt?.message?.content === 'string') assistantText += evt.message.content;
-          if (Array.isArray(evt?.message?.tool_calls) && evt.message.tool_calls.length) toolCalls = evt.message.tool_calls;
-          if (evt?.done) {
-            void logLine({ type: 'message', ts: new Date().toISOString(), role: 'assistant', content: assistantText || undefined, tool_calls: toolCalls })
-              .then(() => {
-                knownMessages += 1;
-                return logLine({ type: 'usage', input: Number(evt.prompt_eval_count ?? 0), output: Number(evt.eval_count ?? 0) });
-              })
-              .then(() => logLine({ type: 'turn_complete', ts: new Date().toISOString() }))
-              .catch((err) => console.error('ollama-logger transcript write error:', err));
-            assistantText = '';
-            toolCalls = undefined;
-          }
-        } catch {
-          // partial NDJSON frame; the next chunk completes it
-        }
+      const newMessages = messages.slice(knownMessages);
+      knownMessages = messages.length;
+      const reqTs = new Date().toISOString();
+      for (const m of newMessages) {
+        await logLine({ type: 'message', ts: reqTs, role: m?.role, content: typeof m?.content === 'string' ? m.content : undefined, tool_calls: m?.tool_calls });
       }
-    });
-    node.on('end', () => res.end());
-    node.on('error', (err) => {
-      console.error('ollama-logger chat stream error:', err);
-      res.destroy(err as Error);
-    });
+
+      let buffered = '';
+      let assistantText = '';
+      let toolCalls: any[] | undefined;
+      const node = Readable.fromWeb(upstreamRes.body as any);
+      node.on('data', (chunk: Buffer) => {
+        res.write(chunk);
+        buffered += chunk.toString('utf8');
+        let idx: number;
+        while ((idx = buffered.indexOf('\n')) >= 0) {
+          const line = buffered.slice(0, idx).trim();
+          buffered = buffered.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const evt = JSON.parse(line);
+            if (typeof evt?.message?.content === 'string') assistantText += evt.message.content;
+            if (Array.isArray(evt?.message?.tool_calls) && evt.message.tool_calls.length) toolCalls = evt.message.tool_calls;
+            if (evt?.done) {
+              void logLine({ type: 'message', ts: new Date().toISOString(), role: 'assistant', content: assistantText || undefined, tool_calls: toolCalls })
+                .then(() => {
+                  knownMessages += 1;
+                  return logLine({ type: 'usage', input: Number(evt.prompt_eval_count ?? 0), output: Number(evt.eval_count ?? 0) });
+                })
+                .then(() => logLine({ type: 'turn_complete', ts: new Date().toISOString() }))
+                .catch((err) => console.error('ollama-logger transcript write error:', err));
+              assistantText = '';
+              toolCalls = undefined;
+            }
+          } catch {
+            // partial NDJSON frame; the next chunk completes it
+          }
+        }
+      });
+      node.on('end', () => res.end());
+      node.on('error', (err) => {
+        console.error('ollama-logger chat stream error:', err);
+        res.destroy(err as Error);
+      });
+    } else {
+      // Generate endpoint (/api/generate): tee while streaming back to the client unchanged.
+      // Each generate call is one turn — no growing message history, no knownMessages dedup.
+      const reqTs = new Date().toISOString();
+      if (typeof reqBody.prompt === 'string') {
+        await logLine({ type: 'message', ts: reqTs, role: 'user', content: reqBody.prompt });
+      }
+
+      let buffered = '';
+      let assistantText = '';
+      const node = Readable.fromWeb(upstreamRes.body as any);
+      node.on('data', (chunk: Buffer) => {
+        res.write(chunk);
+        buffered += chunk.toString('utf8');
+        let idx: number;
+        while ((idx = buffered.indexOf('\n')) >= 0) {
+          const line = buffered.slice(0, idx).trim();
+          buffered = buffered.slice(idx + 1);
+          if (!line) continue;
+          try {
+            const evt = JSON.parse(line);
+            if (typeof evt?.response === 'string') assistantText += evt.response;
+            if (evt?.done) {
+              void logLine({ type: 'message', ts: new Date().toISOString(), role: 'assistant', content: assistantText || undefined })
+                .then(() => logLine({ type: 'usage', input: Number(evt.prompt_eval_count ?? 0), output: Number(evt.eval_count ?? 0) }))
+                .then(() => logLine({ type: 'turn_complete', ts: new Date().toISOString() }))
+                .catch((err) => console.error('ollama-logger transcript write error:', err));
+              assistantText = '';
+            }
+          } catch {
+            // partial NDJSON frame; the next chunk completes it
+          }
+        }
+      });
+      node.on('end', () => res.end());
+      node.on('error', (err) => {
+        console.error('ollama-logger generate stream error:', err);
+        res.destroy(err as Error);
+      });
+    }
   }
 
   const server = createServer((req, res) => {
