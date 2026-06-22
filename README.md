@@ -83,6 +83,37 @@ AOA_CODEX_LOOKBACK_DAYS=3 npm run dev
 Codex watches recent date folders by default instead of the entire historical
 `~/.codex/sessions` tree.
 
+### Local LLMs (Ollama, llama.cpp, vLLM, oMLX)
+
+Local engines don't write transcripts, so Age of Agents captures them through a
+small logging proxy. Two ways in:
+
+**Ollama (terminal):**
+
+```bash
+aoa local llama3        # wraps `ollama run llama3` and logs it as a hero
+```
+
+The session shows up on the battlefield; the model appears in the **Modele** tab,
+where you can assign a sprite (context window is read automatically from Ollama).
+
+**Any OpenAI-compatible backend (llama.cpp / vLLM / oMLX / coding agents):**
+
+```bash
+LLM_BASE_URL=http://localhost:8000/v1 aoa local-proxy   # prints a proxy URL
+```
+
+Point your client's base URL at the printed proxy URL. Default backend base URLs:
+
+| Backend   | Default base URL                |
+|-----------|---------------------------------|
+| Ollama    | `http://localhost:11434/v1`     |
+| llama.cpp | `http://localhost:8080/v1`      |
+| vLLM      | `http://localhost:8000/v1`      |
+| oMLX      | `http://localhost:10240/v1`     |
+
+Overrides: `LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY`.
+
 ## 🧭 How it works
 
 ```
