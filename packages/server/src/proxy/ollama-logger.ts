@@ -102,7 +102,7 @@ export function teeOllamaGenerate(reqBody: any, ndjsonLines: string[]): Transcri
     try {
       evt = JSON.parse(trimmed);
     } catch {
-      continue; // partial frame split across chunks; the next chunk completes it
+      continue; // malformed / non-JSON line; skip
     }
     if (typeof evt?.response === 'string') assistantText += evt.response;
     if (evt?.done) {

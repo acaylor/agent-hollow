@@ -62,7 +62,7 @@ async function runLocal(rest: string[]): Promise<number> {
   return await new Promise<number>((resolve) => {
     child.on('error', (err) => {
       process.stderr.write(`Failed to run 'ollama' — is it installed and on PATH? (${(err as Error).message})\n`);
-      resolve(127);
+      void proxy.close().then(() => resolve(127));
     });
     child.on('exit', (code) => {
       void proxy.close().then(() => resolve(code ?? 0));
