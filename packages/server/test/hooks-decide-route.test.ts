@@ -31,7 +31,7 @@ describe('/hooks/decide', () => {
 
   it('enabled + WS answer allow -> allow decision', async () => {
     server = await startServer({ port: 0, demo: false, policyPath: policyFile(true) });
-    const ws = new WebSocket(`${server.url.replace('http', 'ws')}${WS_PATH}`);
+    const ws = new WebSocket(`${server.url.replace('http', 'ws')}${WS_PATH}?token=${server.token}`);
     const pending = new Promise<PendingQuestion>((resolve) => {
       ws.on('message', (data) => {
         const ev = JSON.parse(String(data)) as GameEvent;

@@ -15,7 +15,7 @@ import { LiveSessionRegistry } from './sdk/sessions.js';
 import { registerSessionRoutes } from './session-routes.js';
 import { registerFsRoutes } from './fs-routes.js';
 import { loadOrCreateToken } from './security/token.js';
-import { registerSecurityGuard } from './security/guard.js';
+import { registerSecurityGuard, verifyWsClient } from './security/guard.js';
 
 export interface StartServerOptions {
   /** HTTP port. Pass 0 so the system picks a free one (useful in tests). */
@@ -167,7 +167,12 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
   const actualPort = typeof address === 'object' && address ? address.port : opts.port;
   resolvedPort = actualPort;
 
-  const wss = new WebSocketServer({ server: app.server, path: WS_PATH });
+  const wss = new WebSocketServer({
+    server: app.server,
+    path: WS_PATH,
+    verifyClient: (info) =>
+      verifyWsClient({ origin: info.origin, reqUrl: info.req.url }, resolvedPort, token),
+  });
 
   const send = (socket: WebSocket, event: GameEvent): void => {
     if (socket.readyState !== WebSocket.OPEN) return;
