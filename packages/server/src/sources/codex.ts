@@ -350,6 +350,12 @@ export function interpretCodexLine(line: string): Fact[] {
       if (payload.type === 'token_count') {
         const u = extractCodexUsage(payload);
         if (u) facts.push({ kind: 'usage-total', ...u });
+      } else if (payload.type === 'user_message') {
+        const text = str(payload.message);
+        if (text && isCodexHumanPrompt(text, 'user')) facts.push({ kind: 'prompt', text: clip(text), ts });
+      } else if (payload.type === 'agent_message') {
+        const text = str(payload.message);
+        if (text) facts.push({ kind: 'assistant-text', text: clip(text), ts });
       } else if (payload.type === 'task_started') {
         facts.push({ kind: 'thinking', ts });
       } else if (payload.type === 'task_complete' || payload.type === 'turn_complete') {

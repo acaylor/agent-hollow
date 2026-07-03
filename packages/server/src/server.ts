@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import { WebSocketServer, WebSocket } from 'ws';
+import { WebSocketServer, WebSocket, type VerifyClientCallbackSync } from 'ws';
 import { WS_PATH, type GameEvent, validateQuestionAnswer } from '@agent-citadel/shared';
 import { World } from './world.js';
 import { registerMappingRoutes } from './mapping-routes.js';
@@ -178,8 +178,9 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
   const wss = new WebSocketServer({
     server: app.server,
     path: WS_PATH,
-    verifyClient: (info) =>
-      verifyWsClient({ origin: info.origin, reqUrl: info.req.url }, resolvedPort, token),
+    verifyClient: ((info) =>
+      verifyWsClient({ origin: info.origin, reqUrl: info.req.url }, resolvedPort, token)
+    ) satisfies VerifyClientCallbackSync,
   });
 
   const send = (socket: WebSocket, event: GameEvent): void => {

@@ -184,6 +184,18 @@ describe('SessionTracker', () => {
     expect(hero?.projectDir).toBe('-Users-mpawelczuk-RTS-agents'); // city key unchanged
   });
 
+  it('meta backfills projectDir from cwd when the source cannot classify a project key', () => {
+    const world = new World();
+    const tracker = new SessionTracker(world, 'session-codex', '', DEFAULT_THRESHOLDS, 'codex');
+
+    tracker.apply({ kind: 'meta', cwd: '/Users/aj/sourcecode/open-source/misc/age-of-agents' });
+
+    const hero = world.getHero('session-codex');
+    expect(hero?.projectDir).toBe('/Users/aj/sourcecode/open-source/misc/age-of-agents');
+    expect(hero?.workingDir).toBe('/Users/aj/sourcecode/open-source/misc/age-of-agents');
+    expect(hero?.projectName).toBe('age-of-agents');
+  });
+
   it('contextTokens = context from the LATEST message (not a sum)', () => {
     const world = new World();
     const tracker = new SessionTracker(world, 'sCtx', 'PD');

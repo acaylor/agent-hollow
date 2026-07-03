@@ -158,6 +158,7 @@ export class SessionTracker {
           this.workingDir = fact.cwd;
         }
         this.patch({
+          ...(!this.projectDir && this.workingDir ? { projectDir: this.workingDir } : {}),
           ...(this.projectName ? { projectName: this.projectName, title: this.displayTitle() } : {}),
           ...(this.workingDir ? { workingDir: this.workingDir } : {}),
           ...(fact.model ? { model: fact.model } : {}),

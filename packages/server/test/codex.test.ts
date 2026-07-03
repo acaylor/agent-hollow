@@ -387,6 +387,43 @@ describe('interpretCodexLine', () => {
       .toContainEqual({ kind: 'turn-end', ts: '2026-06-14T10:05:00.000Z' });
   });
 
+  it('current Codex event_msg user/agent messages become transcript facts', () => {
+    expect(interpretCodexLine(line({
+      type: 'event_msg',
+      timestamp: '2026-06-25T19:11:35.471Z',
+      payload: {
+        type: 'user_message',
+        message: 'I have this running with npm run dev. it works with claude code and opencode but not codex',
+      },
+    }))).toContainEqual({
+      kind: 'prompt',
+      text: 'I have this running with npm run dev. it works with claude code and opencode but not codex',
+      ts: '2026-06-25T19:11:35.471Z',
+    });
+
+    expect(interpretCodexLine(line({
+      type: 'event_msg',
+      timestamp: '2026-06-25T19:12:28.457Z',
+      payload: {
+        type: 'agent_message',
+        message: 'The current Codex file is small enough that startup replay should process it.',
+      },
+    }))).toContainEqual({
+      kind: 'assistant-text',
+      text: 'The current Codex file is small enough that startup replay should process it.',
+      ts: '2026-06-25T19:12:28.457Z',
+    });
+
+    expect(interpretCodexLine(line({
+      type: 'event_msg',
+      timestamp: '2026-06-25T19:11:35.471Z',
+      payload: {
+        type: 'user_message',
+        message: '<environment_context><cwd>/x</cwd></environment_context>',
+      },
+    }))).toEqual([]);
+  });
+
   it('garbage and unknown records -> empty list / valid tool-result', () => {
     expect(interpretCodexLine('to nie json{')).toEqual([]);
     expect(interpretCodexLine(line({ type: 'response_item', payload: { type: 'function_call_output', output: { exit_code: 0 } } }))).toContainEqual({ kind: 'tool-result', isError: false, ts: expect.any(String) });
