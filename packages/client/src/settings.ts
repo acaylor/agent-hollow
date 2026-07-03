@@ -22,12 +22,12 @@ interface SettingsStore {
   setAllRandom(allRandom: boolean): void;
 }
 
-const STORAGE_KEY = 'agent-citadel.theme';
-const LANG_KEY = 'agent-citadel.lang';
-const FLIP_KEY = 'agent-citadel.flip';
-const MISSIONS_COLLAPSED_KEY = 'agent-citadel.missions-collapsed';
-const BAR_COLLAPSED_KEY = 'agent-citadel.bar-collapsed';
-const ALL_RANDOM_KEY = 'agent-citadel.all-random';
+const STORAGE_KEY = 'agent-hollow.theme';
+const LANG_KEY = 'agent-hollow.lang';
+const FLIP_KEY = 'agent-hollow.flip';
+const MISSIONS_COLLAPSED_KEY = 'agent-hollow.missions-collapsed';
+const BAR_COLLAPSED_KEY = 'agent-hollow.bar-collapsed';
+const ALL_RANDOM_KEY = 'agent-hollow.all-random';
 
 const VALID_LANGS: Lang[] = ['en', 'pl', 'it'];
 

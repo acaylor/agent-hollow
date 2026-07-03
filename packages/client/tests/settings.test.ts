@@ -31,7 +31,7 @@ describe('useSettings — missionsCollapsed', () => {
   });
 
   it('czyta zwinięty stan z localStorage ("1")', async () => {
-    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'agent-citadel.missions-collapsed': '1' });
+    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'agent-hollow.missions-collapsed': '1' });
     vi.resetModules();
     const { useSettings } = await import('../src/settings');
     expect(useSettings.getState().missionsCollapsed).toBe(true);
@@ -44,7 +44,7 @@ describe('useSettings — missionsCollapsed', () => {
     const { useSettings } = await import('../src/settings');
     useSettings.getState().setMissionsCollapsed(true);
     expect(useSettings.getState().missionsCollapsed).toBe(true);
-    expect(ls.getItem('agent-citadel.missions-collapsed')).toBe('1');
+    expect(ls.getItem('agent-hollow.missions-collapsed')).toBe('1');
   });
 });
 
@@ -57,7 +57,7 @@ describe('useSettings — flipped', () => {
   });
 
   it('czyta odwrócony stan z localStorage ("1")', async () => {
-    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'agent-citadel.flip': '1' });
+    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'agent-hollow.flip': '1' });
     vi.resetModules();
     const { useSettings } = await import('../src/settings');
     expect(useSettings.getState().flipped).toBe(true);
@@ -70,6 +70,6 @@ describe('useSettings — flipped', () => {
     const { useSettings } = await import('../src/settings');
     useSettings.getState().setFlipped(true);
     expect(useSettings.getState().flipped).toBe(true);
-    expect(ls.getItem('agent-citadel.flip')).toBe('1');
+    expect(ls.getItem('agent-hollow.flip')).toBe('1');
   });
 });

@@ -1,7 +1,7 @@
 import type { LaunchAgentRequest } from '@agent-hollow/shared';
 import { apiFetch } from './api';
 
-const RECENT_KEY = 'agent-citadel.recent-dirs';
+const RECENT_KEY = 'agent-hollow.recent-dirs';
 
 export async function launchAgent(req: LaunchAgentRequest): Promise<{ ok: boolean; sessionId?: string; error?: string }> {
   try {
