@@ -35,6 +35,7 @@ renders them as a calm, real-time strategy realm:
 - **Subagents → workers.** When a session spawns subagents (e.g. the Task tool), they appear as little workers around their settler.
 - **Tokens → harvest.** Tokens read and produced fill the storehouse. Settlers ponder while thinking, rest when waiting, and stroll home when the day's work is done.
 - **Two worlds.** Switch between a **fantasy** (top-down) and a **sci-fi** (isometric) realm on the fly.
+- **Day & night.** The realm follows your local clock — dawn glow, amber dusk, moonlit nights with warm lit windows on every building. Toggle it with the 🌗 button; preview any time of day with `?hour=22` in the URL.
 - **Many projects → cities.** Each project becomes a city you can switch between; open one for an optional peek at [Beads](https://github.com/steveyegge/beads) tasks and a [Graphify](https://github.com/safishamsi/graphify) code map (see [Project intel](#-project-intel-optional)).
 
 A glanceable, second-monitor view of what your agents are quietly up to.

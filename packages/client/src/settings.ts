@@ -14,12 +14,15 @@ interface SettingsStore {
   barCollapsed: boolean;
   /** When true, every agent draws a random sprite from the whole pool (ignores model→sprite mapping). */
   allRandom: boolean;
+  /** Day/night cycle: the realm follows the local clock (dusk tint, lit windows at night). */
+  dayNight: boolean;
   setTheme(id: string): void;
   setLang(lang: Lang): void;
   setFlipped(flipped: boolean): void;
   setMissionsCollapsed(collapsed: boolean): void;
   setBarCollapsed(collapsed: boolean): void;
   setAllRandom(allRandom: boolean): void;
+  setDayNight(dayNight: boolean): void;
 }
 
 const STORAGE_KEY = 'agent-hollow.theme';
@@ -28,6 +31,7 @@ const FLIP_KEY = 'agent-hollow.flip';
 const MISSIONS_COLLAPSED_KEY = 'agent-hollow.missions-collapsed';
 const BAR_COLLAPSED_KEY = 'agent-hollow.bar-collapsed';
 const ALL_RANDOM_KEY = 'agent-hollow.all-random';
+const DAY_NIGHT_KEY = 'agent-hollow.day-night';
 
 const VALID_LANGS: Lang[] = ['en', 'pl', 'it'];
 
@@ -43,6 +47,8 @@ export const useSettings = create<SettingsStore>((set) => ({
   // Default collapsed (only '0' expands) so the top bar stays compact out of the box.
   barCollapsed: localStorage.getItem(BAR_COLLAPSED_KEY) !== '0',
   allRandom: localStorage.getItem(ALL_RANDOM_KEY) === '1',
+  // Default on (only '0' disables) — the cycle is the realm's heartbeat.
+  dayNight: localStorage.getItem(DAY_NIGHT_KEY) !== '0',
   setTheme: (themeId) => {
     localStorage.setItem(STORAGE_KEY, themeId);
     set({ themeId });
@@ -66,5 +72,9 @@ export const useSettings = create<SettingsStore>((set) => ({
   setAllRandom: (allRandom) => {
     localStorage.setItem(ALL_RANDOM_KEY, allRandom ? '1' : '0');
     set({ allRandom });
+  },
+  setDayNight: (dayNight) => {
+    localStorage.setItem(DAY_NIGHT_KEY, dayNight ? '1' : '0');
+    set({ dayNight });
   },
 }));

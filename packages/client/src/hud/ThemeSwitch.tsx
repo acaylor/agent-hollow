@@ -23,6 +23,8 @@ export function ThemeSwitch() {
   const setLang = useSettings((s) => s.setLang);
   const flipped = useSettings((s) => s.flipped);
   const setFlipped = useSettings((s) => s.setFlipped);
+  const dayNight = useSettings((s) => s.dayNight);
+  const setDayNight = useSettings((s) => s.setDayNight);
   const barCollapsed = useSettings((s) => s.barCollapsed);
   const setBarCollapsed = useSettings((s) => s.setBarCollapsed);
   const t = useUi();
@@ -154,6 +156,17 @@ export function ThemeSwitch() {
         aria-pressed={flipped}
       >
         ⇄
+      </button>
+
+      <button
+        className="ghost"
+        style={dayNight ? { background: '#3b3b35' } : undefined}
+        onClick={() => setDayNight(!dayNight)}
+        title={t.dayNight}
+        aria-label={t.dayNight}
+        aria-pressed={dayNight}
+      >
+        🌗
       </button>
 
       {/* Gear: settings (building reactions). */}

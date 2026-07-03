@@ -59,6 +59,7 @@ export interface UiStrings {
   allCities: string;
   language: string;
   flipCity: string;
+  dayNight: string;
   symbols: string;
   edges: string;
   communities: string;
@@ -215,6 +216,7 @@ const EN: UiStrings = {
   allCities: 'All',
   language: 'Language',
   flipCity: 'Mirror city horizontally',
+  dayNight: 'Day/night cycle (follows your clock)',
   symbols: 'Symbols',
   edges: 'Edges',
   communities: 'Communities',
@@ -369,6 +371,7 @@ const PL: UiStrings = {
   allCities: 'Wszystkie',
   language: 'Język',
   flipCity: 'Odbij miasto poziomo',
+  dayNight: 'Cykl dnia i nocy (według zegara)',
   symbols: 'Symbole',
   edges: 'Krawędzie',
   communities: 'Społeczności',
@@ -523,6 +526,7 @@ const IT: UiStrings = {
   allCities: 'Tutte',
   language: 'Lingua',
   flipCity: 'Ribalta la città in orizzontale',
+  dayNight: 'Ciclo giorno/notte (segue il tuo orologio)',
   symbols: 'Simboli',
   edges: 'Archi',
   communities: 'Comunità',

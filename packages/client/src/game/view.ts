@@ -22,8 +22,9 @@ import { BUILDING_FX, collectActiveBuildings, type WorkerSample } from './buildi
 import { buildingText } from '../i18n';
 import { homeBuilding, awaitingBuilding, completedBuilding, recoveryBuilding } from './home-building';
 import { worldLayerTransform, worldToViewport, flipTextNodes } from './flip';
-import type { Lang } from '../settings';
+import { useSettings, type Lang } from '../settings';
 import { contextPct } from '../context-progress';
+import { daylightAt, localHour, parseHourOverride, DAY_TINT } from './daylight';
 
 /** Target decoration width in tiles (for sprite scaling). */
 const DECO_W: Record<DecoKind, number> = { tree: 1.1, rock: 0.8, bush: 0.75, flower: 0.7 };
@@ -104,6 +105,9 @@ export class GameView {
   private emitters = new Map<BuildingId, FxEmitter>();
   private lastClearedAt = new Map<string, number>();
   private elapsed = 0;
+  private duskOverlay?: Graphics;
+  private buildingLights: { g: Graphics; phase: number }[] = [];
+  private hourOverride?: number; // ?hour= URL param (testing/screenshots)
   private missionStatus = new Map<string, string>();
   private graph: WaypointGraph;
   private unsubscribe?: () => void;
@@ -267,6 +271,7 @@ export class GameView {
 
     worldLayer.addChild(this.unitLayer);
     worldLayer.addChild(this.fxLayer);
+    this.buildDaylight(worldRect);
 
     this.app.ticker.add((ticker) => {
       const dt = ticker.deltaMS / 1000;
@@ -282,6 +287,7 @@ export class GameView {
       this.updateRetiring(dt);
       this.updateBuildingFx(dt);
       this.updateParticles(dt);
+      this.updateDaylight();
     });
 
     this.unsubscribe = useWorld.subscribe((state) =>
@@ -691,6 +697,62 @@ export class GameView {
       maxLife: life,
       gravity: 36, // light gravity: particle rises and slows down
     });
+  }
+
+  /**
+   * Day/night scenery: a multiply-tinted overlay across the whole world (its
+   * tint follows the local clock via daylightAt) plus a warm "lit windows"
+   * glow per building that only shows after dusk. The glow layer sits ABOVE
+   * the overlay so lights punch through the night instead of being dimmed.
+   */
+  private buildDaylight(rect: { minX: number; minY: number; maxX: number; maxY: number }): void {
+    this.hourOverride = parseHourOverride(window.location.search);
+
+    const overlay = new Graphics();
+    overlay.rect(rect.minX, rect.minY, rect.maxX - rect.minX, rect.maxY - rect.minY).fill(0xffffff);
+    overlay.blendMode = 'multiply';
+    overlay.eventMode = 'none';
+    overlay.visible = false;
+    this.worldLayer.addChild(overlay);
+    this.duskOverlay = overlay;
+
+    for (const b of this.theme.buildings) {
+      const anchor = this.windowAnchor(b);
+      const glow = new Graphics();
+      const r = this.theme.tile * 0.55;
+      for (const k of [1, 0.6, 0.32]) glow.circle(0, 0, r * k).fill({ color: 0xffb45e, alpha: 0.34 });
+      glow.blendMode = 'add';
+      glow.eventMode = 'none';
+      glow.position.set(anchor.x, anchor.y);
+      glow.alpha = 0;
+      this.worldLayer.addChild(glow);
+      this.buildingLights.push({ g: glow, phase: b.gx * 3.1 + b.gy * 1.7 });
+    }
+  }
+
+  /** Apply the current clock (or ?hour= override) to overlay tint and window glows. */
+  private updateDaylight(): void {
+    if (!this.duskOverlay) return;
+    const enabled = useSettings.getState().dayNight;
+    const d = enabled ? daylightAt(this.hourOverride ?? localHour()) : { tint: DAY_TINT, lights: 0 };
+    this.duskOverlay.tint = d.tint;
+    this.duskOverlay.visible = d.tint !== DAY_TINT;
+    const lit = d.lights > 0.01;
+    for (const light of this.buildingLights) {
+      light.g.visible = lit;
+      if (!lit) continue;
+      // Slow candle-like flicker, desynchronized per building.
+      const flicker = 0.82 + 0.18 * Math.sin(this.elapsed * 2.3 + light.phase);
+      light.g.alpha = d.lights * flicker;
+    }
+  }
+
+  /** Anchor for the "lit windows" night glow: mid-height of the building solid. */
+  private windowAnchor(b: BuildingDef): { x: number; y: number } {
+    const foot = this.theme.projection.toScreen(b.gx + b.w / 2, b.gy + b.h);
+    const tex = getBuildingSprite(b.id);
+    const hgt = tex ? tex.height * ((b.w * this.theme.tile) / tex.width) : this.theme.tile * (b.h + 1);
+    return { x: foot.x, y: foot.y - hgt * 0.42 };
   }
 
   /** FX anchor point near the building sprite top (from texture dimensions). */
