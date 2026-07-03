@@ -5,7 +5,7 @@ import {
   type PermissionRule,
   type PendingQuestion,
   type PendingQuestionOption,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 import type { PendingRegistry } from './pending-registry.js';
 import { decisionToHookOutput, type HookPayload } from './hooks.js';
 import { toolDetail } from './transcript/parser.js';

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import type { AgentKind } from '@agent-citadel/shared';
+import type { AgentKind } from '@agent-hollow/shared';
 import { resolveProvider } from '../theme/providers';
 import { emblemSrc } from '../theme/emblems';
 

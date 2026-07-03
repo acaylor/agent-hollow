@@ -18,7 +18,7 @@ export function isSensitiveRoute(method: string, path: string): boolean {
 /**
  * Global request gate:
  *  1. reject a present, non-allowlisted Origin (drive-by) with 403;
- *  2. require a valid x-aoa-token on sensitive routes with 401.
+ *  2. require a valid x-hollow-token on sensitive routes with 401.
  * Port is read lazily because the real port is only known after listen().
  */
 export function registerSecurityGuard(
@@ -32,7 +32,7 @@ export function registerSecurityGuard(
     }
     const path = request.url.split('?')[0];
     if (isSensitiveRoute(request.method, path)) {
-      const tok = request.headers['x-aoa-token'];
+      const tok = request.headers['x-hollow-token'];
       if (typeof tok !== 'string' || !timingSafeEqualStr(tok, opts.token)) {
         return reply.code(401).send({ error: 'missing or invalid token' });
       }

@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type { ArsenalAgent, ArsenalOrigin } from '@agent-citadel/shared';
+import type { ArsenalAgent, ArsenalOrigin } from '@agent-hollow/shared';
 import { parseFrontmatter } from '../frontmatter.js';
 
 interface Opts { workingDir: string; homeDir: string; }

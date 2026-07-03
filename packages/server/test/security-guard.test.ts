@@ -30,19 +30,19 @@ describe('registerSecurityGuard', () => {
     app = await build();
     const no = await app.inject({ method: 'POST', url: '/sessions/launch' });
     expect(no.statusCode).toBe(401);
-    const bad = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { 'x-aoa-token': 'nope' } });
+    const bad = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { 'x-hollow-token': 'nope' } });
     expect(bad.statusCode).toBe(401);
-    const ok = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { 'x-aoa-token': 'secret' } });
+    const ok = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { 'x-hollow-token': 'secret' } });
     expect(ok.statusCode).toBe(200);
   });
   it('checks origin before token (403 wins over a good token)', async () => {
     app = await build();
-    const res = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { origin: 'https://evil.com', 'x-aoa-token': 'secret' } });
+    const res = await app.inject({ method: 'POST', url: '/sessions/launch', headers: { origin: 'https://evil.com', 'x-hollow-token': 'secret' } });
     expect(res.statusCode).toBe(403);
   });
   it('allows a dev-port origin with token', async () => {
     app = await build();
-    const res = await app.inject({ method: 'PUT', url: '/tool-mapping', headers: { origin: 'http://localhost:5173', 'x-aoa-token': 'secret' } });
+    const res = await app.inject({ method: 'PUT', url: '/tool-mapping', headers: { origin: 'http://localhost:5173', 'x-hollow-token': 'secret' } });
     expect(res.statusCode).toBe(200);
   });
 });

@@ -7,7 +7,7 @@ import {
   recoveryBuildingForTheme,
   type BuildingId,
   type HeroSnapshot,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 import type { ThemeDef } from '../theme/types';
 
 /** "Waiting room" building where a hero awaiting user input goes (awaiting-input).

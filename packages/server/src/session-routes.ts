@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { validateLaunchRequest } from '@agent-citadel/shared';
+import { validateLaunchRequest } from '@agent-hollow/shared';
 import type { LiveSessionRegistry } from './sdk/sessions.js';
 
 export interface SessionRoutesOptions { sessions: LiveSessionRegistry; }

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { PendingQuestion } from '@agent-citadel/shared';
+import type { PendingQuestion } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
 import { sendAnswer } from '../ws';

@@ -51,7 +51,7 @@ describe('useMapping store', () => {
     };
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response('{}'))));
     useMapping.getState().setMapping(CUSTOM);
-    expect(JSON.parse(store['age-of-agents.mapping'])).toEqual(CUSTOM);
+    expect(JSON.parse(store['agent-hollow.mapping'])).toEqual(CUSTOM);
   });
 
   it('resetMapping restores DEFAULT_MAPPING', () => {
@@ -76,7 +76,7 @@ describe('useMapping store', () => {
     useMapping.getState().setMapping(CUSTOM);
     await Promise.resolve(); // let the rejection propagate
     expect(useMapping.getState().mapping).toEqual(CUSTOM);
-    expect(JSON.parse(store['age-of-agents.mapping'])).toEqual(CUSTOM);
+    expect(JSON.parse(store['agent-hollow.mapping'])).toEqual(CUSTOM);
   });
 
   it('hydrate loads config from GET', async () => {
@@ -99,7 +99,7 @@ describe('useMapping store', () => {
     };
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response(JSON.stringify(CUSTOM)))));
     await useMapping.getState().hydrate();
-    expect(JSON.parse(store['age-of-agents.mapping'])).toEqual(CUSTOM);
+    expect(JSON.parse(store['agent-hollow.mapping'])).toEqual(CUSTOM);
   });
 
   it('hydrate leaves current config on network error', async () => {

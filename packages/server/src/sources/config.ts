@@ -18,23 +18,23 @@ export function parseSourceFilter(raw: string | undefined): Set<SourceId> | unde
   const out = new Set<SourceId>();
   for (const part of text.split(',')) {
     const id = part.trim();
-    if (!SOURCE_ID_SET.has(id)) throw new Error(`Unknown AOA_SOURCES value: ${id}`);
+    if (!SOURCE_ID_SET.has(id)) throw new Error(`Unknown HOLLOW_SOURCES value: ${id}`);
     out.add(id as SourceId);
   }
   return out;
 }
 
-export function filterSources(sources: AgentSource[], raw = process.env.AOA_SOURCES): AgentSource[] {
+export function filterSources(sources: AgentSource[], raw = process.env.HOLLOW_SOURCES): AgentSource[] {
   const filter = parseSourceFilter(raw);
   if (!filter) return sources;
   return sources.filter((source) => filter.has(source.id));
 }
 
-export function parseCodexLookbackDays(raw = process.env.AOA_CODEX_LOOKBACK_DAYS): number {
+export function parseCodexLookbackDays(raw = process.env.HOLLOW_CODEX_LOOKBACK_DAYS): number {
   if (raw === undefined || raw.trim() === '') return 1;
   const value = Number(raw);
   if (!Number.isInteger(value) || value < 1 || value > 30) {
-    throw new Error(`Invalid AOA_CODEX_LOOKBACK_DAYS: ${raw}`);
+    throw new Error(`Invalid HOLLOW_CODEX_LOOKBACK_DAYS: ${raw}`);
   }
   return value;
 }

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { isSafeTool, type PendingQuestion } from '@agent-citadel/shared';
+import { isSafeTool, type PendingQuestion } from '@agent-hollow/shared';
 import type { PendingRegistry } from '../pending-registry.js';
 import { parseAskUserQuestion } from '../hook-decide.js';
 

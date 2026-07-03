@@ -1,5 +1,5 @@
 import { useMemo, useState, type ReactNode } from 'react';
-import type { ArsenalAgent, ArsenalConnector, ArsenalHook, ArsenalSkill, ProjectArsenal } from '@agent-citadel/shared';
+import type { ArsenalAgent, ArsenalConnector, ArsenalHook, ArsenalSkill, ProjectArsenal } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
 import { relTime } from '../util';

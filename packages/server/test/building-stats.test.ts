@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { accumulateMessage, computeBuildingStats, getBuildingStats, invalidateBuildingStatsCache } from '../src/building-stats.js';
-import type { BuildingId, MappingConfig } from '@agent-citadel/shared';
+import type { BuildingId, MappingConfig } from '@agent-hollow/shared';
 
 const DAY = 86_400_000;
 const NOW = Date.parse('2026-06-13T12:00:00.000Z');
@@ -74,7 +74,7 @@ describe('accumulateMessage', () => {
 
 /** Corpus with one assistant message using `tool` (fresh timestamp -> in the 30-day window). */
 function rootWithTool(tool: string): string {
-  const dir = mkdtempSync(join(tmpdir(), 'aoa-stats-'));
+  const dir = mkdtempSync(join(tmpdir(), 'hollow-stats-'));
   const rec = {
     type: 'assistant',
     timestamp: new Date().toISOString(),
@@ -85,7 +85,7 @@ function rootWithTool(tool: string): string {
 }
 
 function rootWithCodexRecords(records: unknown[]): string {
-  const dir = mkdtempSync(join(tmpdir(), 'aoa-codex-stats-'));
+  const dir = mkdtempSync(join(tmpdir(), 'hollow-codex-stats-'));
   writeFileSync(
     join(dir, 'rollout-2026-06-20T12-00-00-019ee492-d59e-7813-8277-dc58a1bb2c1e.jsonl'),
     records.map((r) => JSON.stringify(r)).join('\n') + '\n',

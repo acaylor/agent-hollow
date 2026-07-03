@@ -1,5 +1,5 @@
 import { basename } from 'node:path';
-import type { ActionEntry, AgentKind, HeroSnapshot, WieldedArsenal } from '@agent-citadel/shared';
+import type { ActionEntry, AgentKind, HeroSnapshot, WieldedArsenal } from '@agent-hollow/shared';
 import type { Fact } from './transcript/facts.js';
 import { cleanTitle, isSubstantialPrompt } from './transcript/title.js';
 import type { World } from './world.js';

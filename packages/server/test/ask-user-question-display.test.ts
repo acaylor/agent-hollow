@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { World } from '../src/world.js';
 import { PendingRegistry } from '../src/pending-registry.js';
 import { decideHook, parseAskUserQuestion } from '../src/hook-decide.js';
-import type { PermissionPolicy } from '@agent-citadel/shared';
+import type { PermissionPolicy } from '@agent-hollow/shared';
 
 const on = (rules: PermissionPolicy['rules'] = []): PermissionPolicy => ({ enabled: true, rules });
 

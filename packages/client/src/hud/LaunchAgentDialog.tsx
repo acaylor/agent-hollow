@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { SDK_PERMISSION_MODES, type SdkPermissionMode } from '@agent-citadel/shared';
+import { SDK_PERMISSION_MODES, type SdkPermissionMode } from '@agent-hollow/shared';
 import { useUi } from '../i18n';
 import { launchAgent, listDirs, recentDirs, sessionsStatus } from '../sessions';
 import { useWorld } from '../store';
 
 /** BETA setup instructions (token auth) — GitHub Pages section. */
-const LAUNCH_DOCS_URL = 'https://agentsmill.github.io/age-of-agents/#launch-agent';
+const LAUNCH_DOCS_URL = 'https://acaylor.github.io/agent-hollow/#launch-agent';
 
 export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
   const t = useUi();

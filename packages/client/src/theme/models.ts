@@ -14,7 +14,7 @@ export {
   DEFAULT_MODEL_CONFIG,
   upgradeModelConfig,
   validateModelConfig,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 export type {
   SpriteId,
   ModelMatch,
@@ -22,4 +22,4 @@ export type {
   WindowRule,
   ModelConfig,
   ResolvedModel,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';

@@ -1,4 +1,4 @@
-import type { AgentKind } from '@agent-citadel/shared';
+import type { AgentKind } from '@agent-hollow/shared';
 import type { Fact } from '../transcript/facts.js';
 
 export type { AgentKind };

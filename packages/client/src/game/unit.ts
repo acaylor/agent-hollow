@@ -1,5 +1,5 @@
 import { AnimatedSprite, Container, Graphics, Sprite, Text, type Spritesheet } from 'pixi.js';
-import { resolveProvider, type AgentKind, type HeroStateKind } from '@agent-citadel/shared';
+import { resolveProvider, type AgentKind, type HeroStateKind } from '@agent-hollow/shared';
 import { getEmblemTexture } from './emblems';
 import type { Projection } from './projection';
 import type { PathNode } from './pathfind';

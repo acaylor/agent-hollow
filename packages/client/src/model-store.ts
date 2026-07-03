@@ -19,7 +19,7 @@ import { apiFetch } from './api';
  * but the client keeps an optimistic cache so the world reacts IMMEDIATELY:
  * setModels updates state + localStorage + background PUT. Twin of mapping-store.ts.
  */
-const STORAGE_KEY = 'age-of-agents.models';
+const STORAGE_KEY = 'agent-hollow.models';
 
 function readCache(): ModelConfig {
   if (typeof localStorage === 'undefined') return DEFAULT_MODEL_CONFIG;

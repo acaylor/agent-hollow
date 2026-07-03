@@ -9,7 +9,7 @@ afterEach(() => { if (dir) rmSync(dir, { recursive: true, force: true }); dir = 
 
 describe('loadOrCreateToken', () => {
   it('creates a 64-char hex token in a 0600 file and is stable on reload', async () => {
-    dir = mkdtempSync(join(tmpdir(), 'aoa-tok-'));
+    dir = mkdtempSync(join(tmpdir(), 'hollow-tok-'));
     const p = join(dir, 'session-token');
     const first = await loadOrCreateToken(p);
     expect(first).toMatch(/^[0-9a-f]{64}$/);

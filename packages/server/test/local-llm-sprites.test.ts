@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveModel, DEFAULT_MODEL_CONFIG } from '@agent-citadel/shared';
+import { resolveModel, DEFAULT_MODEL_CONFIG } from '@agent-hollow/shared';
 
 describe('local model family sprites', () => {
   it('gives common local families a non-fallback identity', () => {

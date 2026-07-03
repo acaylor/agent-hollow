@@ -244,9 +244,9 @@ export function interpretKodaLine(line: string): Fact[] {
   return facts;
 }
 
-/** Decodes Koda session directory path (e.g. "--C--Users-pietr--progetti-age-of-agents--") to Windows path. */
+/** Decodes Koda session directory path (e.g. "--C--Users-pietr--progetti-agent-hollow--") to Windows path. */
 function decodeKodaDir(encoded: string): string {
-  // Format: --C--Users-pietr--progetti-age-of-agents--
+  // Format: --C--Users-pietr--progetti-agent-hollow--
   // First 2 hyphens are "//C:/" - on Windows this is the drive.
   // Generally: each "--" pair is a separator.
   // "C--" at the start is "C:/".

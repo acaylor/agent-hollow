@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { validateLaunchRequest } from '@agent-citadel/shared';
+import { validateLaunchRequest } from '@agent-hollow/shared';
 
 describe('validateLaunchRequest', () => {
   it('accepts a valid request', () => {

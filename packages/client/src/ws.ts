@@ -1,4 +1,4 @@
-import { WS_PATH, type GameEvent, type QuestionAnswer } from '@agent-citadel/shared';
+import { WS_PATH, type GameEvent, type QuestionAnswer } from '@agent-hollow/shared';
 import { useWorld } from './store';
 import { getToken } from './api';
 

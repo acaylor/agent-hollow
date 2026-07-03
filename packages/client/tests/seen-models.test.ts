@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { seenModelsByAgent } from '../src/hud/seen-models';
-import type { AgentKind, HeroSnapshot } from '@agent-citadel/shared';
+import type { AgentKind, HeroSnapshot } from '@agent-hollow/shared';
 
 /**
  * seenModelsByAgent zastępuje inline'owy `seen` memo w ModelRegistryEditor:

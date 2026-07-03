@@ -1,4 +1,4 @@
-import { resolveProvider, type AgentKind } from '@agent-citadel/shared';
+import { resolveProvider, type AgentKind } from '@agent-hollow/shared';
 
 /**
  * Graficzne herby providerów (Faza 2) — theme-agnostic PNG-i w public/assets/emblems.

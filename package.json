@@ -1,21 +1,24 @@
 {
-  "name": "age-of-agents",
+  "name": "agent-hollow",
   "version": "0.8.1",
-  "description": "Age of Agents: visualize Claude Code sessions as a pixel-art RTS",
+  "description": "Agent Hollow: visualize Claude Code sessions as a pixel-art RTS",
   "type": "module",
   "license": "MIT",
-  "author": "Mateusz Pawelczuk",
-  "homepage": "https://agentsmill.github.io/age-of-agents/",
+  "author": "AJ Caylor <ajcaylor@gmail.com>",
+  "contributors": [
+    "Mateusz Pawelczuk (original author of Age of Agents)"
+  ],
+  "homepage": "https://acaylor.github.io/agent-hollow/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentsmill/age-of-agents.git"
+    "url": "https://github.com/acaylor/agent-hollow.git"
   },
   "bugs": {
-    "url": "https://github.com/agentsmill/age-of-agents/issues"
+    "url": "https://github.com/acaylor/agent-hollow/issues"
   },
   "bin": {
-    "age-of-agents": "dist/cli.js",
-    "aoa": "dist/cli.js"
+    "agent-hollow": "dist/cli.js",
+    "hollow": "dist/cli.js"
   },
   "files": [
     "dist",
@@ -33,11 +36,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n server,client -c blue,green \"npm run dev -w @agent-citadel/server\" \"npm run dev -w @agent-citadel/client\"",
-    "demo": "concurrently -n server,client -c blue,green \"npm run dev -w @agent-citadel/server -- --demo\" \"npm run dev -w @agent-citadel/client\"",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev -w @agent-hollow/server\" \"npm run dev -w @agent-hollow/client\"",
+    "demo": "concurrently -n server,client -c blue,green \"npm run dev -w @agent-hollow/server -- --demo\" \"npm run dev -w @agent-hollow/client\"",
     "assets": "node scripts/download-assets.mjs",
-    "test": "npm run test -w @agent-citadel/server && npm run test -w @agent-citadel/client",
-    "build:web": "npm run build -w @agent-citadel/client",
+    "test": "npm run test -w @agent-hollow/server && npm run test -w @agent-hollow/client",
+    "build:web": "npm run build -w @agent-hollow/client",
     "build:server": "node scripts/build-server.mjs",
     "build": "npm run build:web && npm run build:server",
     "prepublishOnly": "npm run build && npm test"

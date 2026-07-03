@@ -41,20 +41,20 @@ describe('interpretCodexLine', () => {
     expect(interpretCodexLine(line({
       type: 'turn_context',
       timestamp: '2026-06-20T11:59:55.986Z',
-      payload: { cwd: '/Users/x/age-of-agents', model: 'gpt-5.5' },
+      payload: { cwd: '/Users/x/agent-hollow', model: 'gpt-5.5' },
     }))).toContainEqual({
       kind: 'meta',
-      cwd: '/Users/x/age-of-agents',
+      cwd: '/Users/x/agent-hollow',
       model: 'gpt-5.5',
     });
 
     expect(interpretCodexLine(line({
       type: 'session_meta',
       timestamp: '2026-06-20T11:59:56.225Z',
-      payload: { cwd: '/Users/x/age-of-agents', model_provider: 'openai', thread_source: 'user' },
+      payload: { cwd: '/Users/x/agent-hollow', model_provider: 'openai', thread_source: 'user' },
     }))).toContainEqual({
       kind: 'meta',
-      cwd: '/Users/x/age-of-agents',
+      cwd: '/Users/x/agent-hollow',
       model: undefined,
     });
   });

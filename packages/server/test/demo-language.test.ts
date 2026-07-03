@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import type { GameEvent } from '@agent-citadel/shared';
+import type { GameEvent } from '@agent-hollow/shared';
 import { World } from '../src/world.js';
 import { startDemo } from '../src/demo/scenario.js';
 

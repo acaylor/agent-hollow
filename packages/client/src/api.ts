@@ -16,10 +16,10 @@ export function getToken(): Promise<string> {
   return tokenPromise;
 }
 
-/** fetch() that attaches the session token in the x-aoa-token header. */
+/** fetch() that attaches the session token in the x-hollow-token header. */
 export async function apiFetch(input: string, init: RequestInit = {}): Promise<Response> {
   const token = await getToken();
   const headers = new Headers(init.headers);
-  headers.set('x-aoa-token', token);
+  headers.set('x-hollow-token', token);
   return fetch(input, { ...init, headers });
 }

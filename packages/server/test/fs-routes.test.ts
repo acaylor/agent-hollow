@@ -11,7 +11,7 @@ afterEach(async () => { await app?.close(); app = undefined; });
 
 describe('GET /fs/list', () => {
   it('lists subdirectories only, within the allowed root', async () => {
-    const base = mkdtempSync(join(tmpdir(), 'aoa-fs-'));
+    const base = mkdtempSync(join(tmpdir(), 'hollow-fs-'));
     mkdirSync(join(base, 'sub-a')); mkdirSync(join(base, 'sub-b')); writeFileSync(join(base, 'file.txt'), 'x');
     app = await build(base);
     const res = await app.inject({ method: 'GET', url: `/fs/list?dir=${encodeURIComponent(base)}` });
@@ -20,13 +20,13 @@ describe('GET /fs/list', () => {
     expect(body.entries.map((e: { name: string }) => e.name).sort()).toEqual(['sub-a', 'sub-b']);
   });
   it('missing dir within root -> 400', async () => {
-    const base = mkdtempSync(join(tmpdir(), 'aoa-fs-'));
+    const base = mkdtempSync(join(tmpdir(), 'hollow-fs-'));
     app = await build(base);
     const res = await app.inject({ method: 'GET', url: `/fs/list?dir=${encodeURIComponent(join(base, 'nope'))}` });
     expect(res.statusCode).toBe(400);
   });
   it('dir outside the allowed root -> 400', async () => {
-    const base = mkdtempSync(join(tmpdir(), 'aoa-fs-'));
+    const base = mkdtempSync(join(tmpdir(), 'hollow-fs-'));
     app = await build(base);
     const res = await app.inject({ method: 'GET', url: '/fs/list?dir=/etc' });
     expect(res.statusCode).toBe(400);

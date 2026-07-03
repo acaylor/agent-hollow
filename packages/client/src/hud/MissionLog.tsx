@@ -1,4 +1,4 @@
-import type { HeroSnapshot } from '@agent-citadel/shared';
+import type { HeroSnapshot } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { useSettings } from '../settings';
 import { useUi } from '../i18n';

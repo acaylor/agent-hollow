@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { World } from '../src/world.js';
 import { PendingRegistry } from '../src/pending-registry.js';
-import type { PendingQuestion } from '@agent-citadel/shared';
+import type { PendingQuestion } from '@agent-hollow/shared';
 
 function q(id: string, sessionId = 's1'): PendingQuestion {
   return { id, sessionId, source: 'hook', kind: 'tool-permission', tool: 'Bash', detail: 'rm', createdAt: '2026-06-21T00:00:00Z' };

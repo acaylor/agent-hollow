@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { GameEvent } from '@agent-citadel/shared';
+import type { GameEvent } from '@agent-hollow/shared';
 import { SessionTracker, DEFAULT_THRESHOLDS } from '../src/state-machine.js';
 import { World } from '../src/world.js';
 
@@ -188,12 +188,12 @@ describe('SessionTracker', () => {
     const world = new World();
     const tracker = new SessionTracker(world, 'session-codex', '', DEFAULT_THRESHOLDS, 'codex');
 
-    tracker.apply({ kind: 'meta', cwd: '/Users/aj/sourcecode/open-source/misc/age-of-agents' });
+    tracker.apply({ kind: 'meta', cwd: '/Users/aj/sourcecode/open-source/misc/agent-hollow' });
 
     const hero = world.getHero('session-codex');
-    expect(hero?.projectDir).toBe('/Users/aj/sourcecode/open-source/misc/age-of-agents');
-    expect(hero?.workingDir).toBe('/Users/aj/sourcecode/open-source/misc/age-of-agents');
-    expect(hero?.projectName).toBe('age-of-agents');
+    expect(hero?.projectDir).toBe('/Users/aj/sourcecode/open-source/misc/agent-hollow');
+    expect(hero?.workingDir).toBe('/Users/aj/sourcecode/open-source/misc/agent-hollow');
+    expect(hero?.projectName).toBe('agent-hollow');
   });
 
   it('contextTokens = context from the LATEST message (not a sum)', () => {

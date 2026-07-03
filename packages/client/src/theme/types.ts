@@ -1,7 +1,7 @@
 import type { Projection } from '../game/projection';
-import type { BuildingId } from '@agent-citadel/shared';
+import type { BuildingId } from '@agent-hollow/shared';
 
-// BuildingId is canonical in @agent-citadel/shared (the server needs it too).
+// BuildingId is canonical in @agent-hollow/shared (the server needs it too).
 export type { BuildingId };
 
 export interface BuildingDef {

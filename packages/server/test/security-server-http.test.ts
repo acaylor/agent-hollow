@@ -4,11 +4,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { startServer } from '../src/server.js';
 
-beforeAll(() => { process.env.AOA_SOURCES = 'claude'; });
+beforeAll(() => { process.env.HOLLOW_SOURCES = 'claude'; });
 let server: Awaited<ReturnType<typeof startServer>> | undefined;
 afterEach(async () => { await server?.close(); server = undefined; });
 
-function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'aoa-srv-')), 'session-token'); }
+function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'hollow-srv-')), 'session-token'); }
 
 describe('HTTP security wiring', () => {
   it('serves the token to a same-origin (no-origin) caller', async () => {
@@ -30,7 +30,7 @@ describe('HTTP security wiring', () => {
     });
     expect(no.status).toBe(401);
     const ok = await fetch(`${server.url}/sessions/launch`, {
-      method: 'POST', headers: { 'content-type': 'application/json', 'x-aoa-token': server.token },
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-hollow-token': server.token },
       body: JSON.stringify({ cwd: '/p', prompt: 'x', permissionMode: 'default' }),
     });
     expect(ok.status).toBe(200);

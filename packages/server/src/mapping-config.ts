@@ -1,11 +1,11 @@
 import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
-import { DEFAULT_MAPPING, validateMapping, type MappingConfig } from '@agent-citadel/shared';
+import { DEFAULT_MAPPING, validateMapping, type MappingConfig } from '@agent-hollow/shared';
 
 /**
  * Persistence for the editable tool-to-building map. The local server is the
- * source of truth: a file on the user's disk (`~/.age-of-agents/tool-mapping.json`).
+ * source of truth: a file on the user's disk (`~/.agent-hollow/tool-mapping.json`).
  * Missing or damaged files fall back to DEFAULT_MAPPING so the server never crashes.
  * Token attribution (building-stats) reads the same source, so stats honor user edits.
  *
@@ -14,7 +14,7 @@ import { DEFAULT_MAPPING, validateMapping, type MappingConfig } from '@agent-cit
  */
 
 export function defaultMappingPath(): string {
-  return join(homedir(), '.age-of-agents', 'tool-mapping.json');
+  return join(homedir(), '.agent-hollow', 'tool-mapping.json');
 }
 
 const cache = new Map<string, MappingConfig>();

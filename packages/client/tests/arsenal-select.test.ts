@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { HeroSnapshot } from '@agent-citadel/shared';
+import type { HeroSnapshot } from '@agent-hollow/shared';
 import { aggregateWielded, bareName } from '../src/hud/arsenal-select';
 
 function hero(over: Partial<HeroSnapshot>): HeroSnapshot {

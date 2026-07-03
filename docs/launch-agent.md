@@ -1,6 +1,6 @@
 # 🚀 Launch agent (BETA)
 
-Launch a real Claude Code session from inside Age of Agents — pick a folder, type a
+Launch a real Claude Code session from inside Agent Hollow — pick a folder, type a
 prompt, and answer the agent's permission prompts, plan approvals and multiple‑choice
 questions directly in the panel.
 
@@ -32,7 +32,7 @@ Then start the app from a shell where the token is set:
 ```bash
 export CLAUDE_CODE_OAUTH_TOKEN=<token-from-setup-token>
 unset ANTHROPIC_API_KEY      # if set, it takes precedence and would bill the API instead
-aoa                          # (npm i -g age-of-agents) — or npm run dev from source
+hollow                          # (npm i -g agent-hollow) — or npm run dev from source
 ```
 
 - Usage is billed against your **subscription** (same pool as interactive Claude Code)

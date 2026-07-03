@@ -9,7 +9,7 @@ import type { AgentSource } from './types.js';
 /** All known agent sources. */
 export const ALL_SOURCES: AgentSource[] = [claudeSource, codexSource, opencodeSource, kodaSource, localLlmSource];
 
-export function activeSources(raw = process.env.AOA_SOURCES): AgentSource[] {
+export function activeSources(raw = process.env.HOLLOW_SOURCES): AgentSource[] {
   return filterSources(ALL_SOURCES, raw);
 }
 

@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useEffect, type ReactNode } from 'react';
 import { useWorld } from '../store';
 import { useUi } from '../i18n';
 import { useMenuKeyboard } from './useMenuKeyboard';
-import type { AgentKind, HeroStateKind } from '@agent-citadel/shared';
+import type { AgentKind, HeroStateKind } from '@agent-hollow/shared';
 import { ProviderEmblem } from './ProviderEmblem';
 
 /** Emoji per agent state (visual flourish in city buttons). */

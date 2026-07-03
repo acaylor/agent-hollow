@@ -7,14 +7,14 @@ import type { AgentSource, ClassifiedFile } from './types.js';
  * Source "local-llm": any agent speaking OpenAI-compatible chat-completions
  * (Ollama, llama.cpp, vLLM, oMLX) captured through one of the bundled logging
  * proxies (proxy/ollama-logger.ts, proxy/openai-logger.ts). The proxy writes a
- * JSONL transcript to ~/.age-of-agents/local-llm/sessions/<uuid>.jsonl, which
+ * JSONL transcript to ~/.agent-hollow/local-llm/sessions/<uuid>.jsonl, which
  * this source reads exactly like the claude/codex/opencode/koda sources.
  */
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
 
 export function localLlmSessionsDir(): string {
-  return process.env.LOCAL_LLM_SESSIONS_DIR ?? join(homedir(), '.age-of-agents', 'local-llm', 'sessions');
+  return process.env.LOCAL_LLM_SESSIONS_DIR ?? join(homedir(), '.agent-hollow', 'local-llm', 'sessions');
 }
 
 function clip(text: string, max = 240): string {
@@ -146,7 +146,7 @@ export function interpretLocalLlmLine(line: string): Fact[] {
   return facts;
 }
 
-/** Source local-llm: ~/.age-of-agents/local-llm/sessions/<uuid>.jsonl, one file per session. */
+/** Source local-llm: ~/.agent-hollow/local-llm/sessions/<uuid>.jsonl, one file per session. */
 export const localLlmSource: AgentSource = {
   id: 'local-llm',
   roots: () => [localLlmSessionsDir()],

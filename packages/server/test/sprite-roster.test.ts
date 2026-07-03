@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SPRITE_IDS, resolveSprite, resolveModel, DEFAULT_MODEL_CONFIG } from '@agent-citadel/shared';
+import { SPRITE_IDS, resolveSprite, resolveModel, DEFAULT_MODEL_CONFIG } from '@agent-hollow/shared';
 
 describe('sprite roster', () => {
   it('includes the four new sprite families', () => {

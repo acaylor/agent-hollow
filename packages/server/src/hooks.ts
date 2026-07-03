@@ -1,7 +1,7 @@
 import { readFile, writeFile, copyFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
-import { SERVER_PORT } from '@agent-citadel/shared';
+import { SERVER_PORT } from '@agent-hollow/shared';
 import type { Fact } from './transcript/facts.js';
 import { toolDetail } from './transcript/parser.js';
 
@@ -16,7 +16,7 @@ export const DECIDE_URL = `http://localhost:${SERVER_PORT}/hooks/decide`;
 /** PreToolUse blocks while the panel answers; give it room (seconds). */
 export const DECIDE_TIMEOUT_SEC = 600;
 const BLOCKING_EVENTS = new Set(['PreToolUse']);
-const HOOK_COMMAND_MARKER = 'age-of-agents-hook-shim';
+const HOOK_COMMAND_MARKER = 'agent-hollow-hook-shim';
 const HOOK_EVENTS = ['SessionStart', 'UserPromptSubmit', 'PreToolUse', 'PostToolUse', 'Notification', 'Stop'] as const;
 const MATCHER_EVENTS = new Set(['PreToolUse', 'PostToolUse']);
 

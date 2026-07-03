@@ -1,7 +1,7 @@
 import { watch, type FSWatcher } from 'chokidar';
 import { open } from 'node:fs/promises';
 import { sep } from 'node:path';
-import type { PeonSnapshot } from '@agent-citadel/shared';
+import type { PeonSnapshot } from '@agent-hollow/shared';
 import { TailRegistry } from './transcript/tail.js';
 import { DEFAULT_THRESHOLDS, SessionTracker, type StateThresholds } from './state-machine.js';
 import type { AgentSource, ClassifiedFile } from './sources/types.js';

@@ -31,7 +31,7 @@ describe('useMapping init with localStorage cache', () => {
   it('initializes mapping from valid cache', async () => {
     const custom = { rules: [{ kind: 'exact', tool: 'Edit', building: 'library' }], fallback: 'citadel' };
     (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({
-      'age-of-agents.mapping': JSON.stringify(custom),
+      'agent-hollow.mapping': JSON.stringify(custom),
     });
     vi.resetModules();
     const { useMapping } = await import('../src/mapping-store');
@@ -39,7 +39,7 @@ describe('useMapping init with localStorage cache', () => {
   });
 
   it('broken cache -> DEFAULT_MAPPING', async () => {
-    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'age-of-agents.mapping': '{ broken' });
+    (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({ 'agent-hollow.mapping': '{ broken' });
     vi.resetModules();
     const { useMapping } = await import('../src/mapping-store');
     expect(useMapping.getState().mapping).toEqual(DEFAULT_MAPPING);
@@ -47,7 +47,7 @@ describe('useMapping init with localStorage cache', () => {
 
   it('invalid config in cache -> DEFAULT_MAPPING', async () => {
     (globalThis as { localStorage?: unknown }).localStorage = fakeStorage({
-      'age-of-agents.mapping': JSON.stringify({ rules: [], fallback: 'nope' }),
+      'agent-hollow.mapping': JSON.stringify({ rules: [], fallback: 'nope' }),
     });
     vi.resetModules();
     const { useMapping } = await import('../src/mapping-store');

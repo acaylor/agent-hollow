@@ -17,7 +17,7 @@ import { apiFetch } from './api';
  * imports and works in node environments (tests, no DOM).
  */
 
-const STORAGE_KEY = 'age-of-agents.mapping';
+const STORAGE_KEY = 'agent-hollow.mapping';
 
 function readCache(): MappingConfig {
   if (typeof localStorage === 'undefined') return DEFAULT_MAPPING;

@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify';
-import { DEFAULT_MAPPING, validateMapping, type MappingConfig } from '@agent-citadel/shared';
+import { DEFAULT_MAPPING, validateMapping, type MappingConfig } from '@agent-hollow/shared';
 import { loadMappingConfig, saveMappingConfig } from './mapping-config.js';
 
 export interface MappingRoutesOptions {
   /** true -> PUT writes to disk (source of truth); false (demo) -> only validate and echo. */
   persist: boolean;
-  /** File path when persistent. Defaults to ~/.age-of-agents/tool-mapping.json. */
+  /** File path when persistent. Defaults to ~/.agent-hollow/tool-mapping.json. */
   mappingPath?: string;
   /** Called after a successful save (for example stats cache invalidation). */
   onSaved?: () => void;

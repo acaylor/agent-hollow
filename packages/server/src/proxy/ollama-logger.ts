@@ -6,7 +6,7 @@ import { Readable } from 'node:stream';
 import { localLlmSessionsDir } from '../sources/local-llm.js';
 
 /**
- * Transparent reverse-proxy for the Ollama API. The `aoa local` wrapper points
+ * Transparent reverse-proxy for the Ollama API. The `hollow local` wrapper points
  * `OLLAMA_HOST` at this proxy and execs `ollama run`, so every request the CLI
  * makes is forwarded verbatim to the real Ollama server. We additionally tee
  * `/api/chat` traffic into a JSONL transcript that the `local-llm` source reads.

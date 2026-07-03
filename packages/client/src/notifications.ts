@@ -1,4 +1,4 @@
-import type { GameEvent, HeroSnapshot } from '@agent-citadel/shared';
+import type { GameEvent, HeroSnapshot } from '@agent-hollow/shared';
 
 /** Notification severity; controls icon, accent color, and lifetime. */
 export type NotifKind = 'alert' | 'error' | 'success';

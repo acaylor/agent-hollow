@@ -1,5 +1,5 @@
 {
-  "name": "@agent-citadel/client",
+  "name": "@agent-hollow/client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@agent-citadel/shared": "*",
+    "@agent-hollow/shared": "*",
     "@pixi/react": "^8.0.0",
     "@pixi/tilemap": "^5.0.2",
     "pixi-viewport": "^6.0.0",

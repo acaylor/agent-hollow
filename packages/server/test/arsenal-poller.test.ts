@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import type { GameEvent, HeroSnapshot } from '@agent-citadel/shared';
+import type { GameEvent, HeroSnapshot } from '@agent-hollow/shared';
 import { World } from '../src/world.js';
 import { ArsenalPoller } from '../src/arsenal/arsenal-poller.js';
 

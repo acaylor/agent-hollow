@@ -7,10 +7,10 @@ import {
   savePermissionPolicy,
   invalidatePermissionPolicyCache,
 } from '../src/permission-policy.js';
-import { DEFAULT_PERMISSION_POLICY, type PermissionPolicy } from '@agent-citadel/shared';
+import { DEFAULT_PERMISSION_POLICY, type PermissionPolicy } from '@agent-hollow/shared';
 
 function tmpPath(): string {
-  return join(mkdtempSync(join(tmpdir(), 'aoa-pol-')), 'permission-policy.json');
+  return join(mkdtempSync(join(tmpdir(), 'hollow-pol-')), 'permission-policy.json');
 }
 
 beforeEach(() => invalidatePermissionPolicyCache());

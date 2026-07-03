@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { resolveBuilding, type BuildingId, type HeroStateKind, type TranscriptLine } from '@agent-citadel/shared';
+import { resolveBuilding, type BuildingId, type HeroStateKind, type TranscriptLine } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { useMapping } from '../mapping-store';
 import { useModels } from '../model-store';

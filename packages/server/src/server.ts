@@ -1,6 +1,6 @@
 import Fastify from 'fastify';
 import { WebSocketServer, WebSocket, type VerifyClientCallbackSync } from 'ws';
-import { WS_PATH, type GameEvent, validateQuestionAnswer } from '@agent-citadel/shared';
+import { WS_PATH, type GameEvent, validateQuestionAnswer } from '@agent-hollow/shared';
 import { World } from './world.js';
 import { registerMappingRoutes } from './mapping-routes.js';
 import { registerModelRoutes } from './model-routes.js';
@@ -25,9 +25,9 @@ export interface StartServerOptions {
   demo: boolean;
   /** Katalog ze zbudowanym klientem (dist/web). Gdy podany — serwer serwuje SPA. */
   webRoot?: string;
-  /** Override permission-policy file path (tests). Defaults to ~/.age-of-agents. */
+  /** Override permission-policy file path (tests). Defaults to ~/.agent-hollow. */
   policyPath?: string;
-  /** Override session-token file path (tests). Defaults to ~/.age-of-agents/session-token. */
+  /** Override session-token file path (tests). Defaults to ~/.agent-hollow/session-token. */
   tokenPath?: string;
 }
 
@@ -41,14 +41,14 @@ export interface RunningServer {
 export async function startServer(opts: StartServerOptions): Promise<RunningServer> {
   const host = opts.host ?? '127.0.0.1';
   const LOOPBACK = new Set(['127.0.0.1', '::1', 'localhost']);
-  if (!LOOPBACK.has(host) && process.env.AOA_ALLOW_REMOTE !== '1') {
+  if (!LOOPBACK.has(host) && process.env.HOLLOW_ALLOW_REMOTE !== '1') {
     throw new Error(
       `Refusing to bind to non-loopback host "${host}": the server has no transport ` +
-      `encryption and is meant for local use. Set AOA_ALLOW_REMOTE=1 to override.`,
+      `encryption and is meant for local use. Set HOLLOW_ALLOW_REMOTE=1 to override.`,
     );
   }
   const app = Fastify({ logger: { level: 'info' } });
-  if (!LOOPBACK.has(host)) app.log.warn(`Binding to non-loopback host ${host} (AOA_ALLOW_REMOTE=1)`);
+  if (!LOOPBACK.has(host)) app.log.warn(`Binding to non-loopback host ${host} (HOLLOW_ALLOW_REMOTE=1)`);
   const token = await loadOrCreateToken(opts.tokenPath);
   let resolvedPort = opts.port;
   registerSecurityGuard(app, { getPort: () => resolvedPort, token });
@@ -84,7 +84,7 @@ export async function startServer(opts: StartServerOptions): Promise<RunningServ
     const { activeSources } = await import('./sources/index.js');
     const { translateHook, hooksStatus, installHooks, uninstallHooks, DECIDE_TIMEOUT_SEC } = await import('./hooks.js');
     const { getBuildingStats, invalidateBuildingStatsCache } = await import('./building-stats.js');
-    const sources = activeSources(process.env.AOA_SOURCES);
+    const sources = activeSources(process.env.HOLLOW_SOURCES);
     watchers = sources.map((source) => new SourceWatcher(world, source));
     // HTTP hooks are the Claude channel; route them to the Claude watcher.
     const claudeWatcher = watchers.find((w) => w.id === 'claude');

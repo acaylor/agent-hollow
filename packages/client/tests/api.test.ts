@@ -22,6 +22,6 @@ describe('apiFetch', () => {
     const tokenCalls = calls.filter((c) => c.url === '/session-token');
     expect(tokenCalls).toHaveLength(1); // cached after first fetch
     const launch = calls.find((c) => c.url === '/sessions/launch');
-    expect(launch?.headers['x-aoa-token']).toBe('T123');
+    expect(launch?.headers['x-hollow-token']).toBe('T123');
   });
 });

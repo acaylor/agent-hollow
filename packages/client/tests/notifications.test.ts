@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { deriveNotification } from '../src/notifications';
-import type { GameEvent, HeroSnapshot } from '@agent-citadel/shared';
+import type { GameEvent, HeroSnapshot } from '@agent-hollow/shared';
 
 const hero = (over: Partial<HeroSnapshot>): HeroSnapshot => ({
   sessionId: 's1',

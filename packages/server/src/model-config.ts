@@ -1,16 +1,16 @@
 import { readFile, writeFile, mkdir, rename } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join, dirname } from 'node:path';
-import { DEFAULT_MODEL_CONFIG, upgradeModelConfig, validateModelConfig, type ModelConfig } from '@agent-citadel/shared';
+import { DEFAULT_MODEL_CONFIG, upgradeModelConfig, validateModelConfig, type ModelConfig } from '@agent-hollow/shared';
 
 /**
  * Persistence for the editable model registry. The local server is the source of
- * truth: `~/.age-of-agents/model-config.json`. Missing or damaged files fall back
+ * truth: `~/.agent-hollow/model-config.json`. Missing or damaged files fall back
  * to DEFAULT so the server never crashes. Sibling to mapping-config.ts. Cache is
  * keyed by path.
  */
 export function defaultModelConfigPath(): string {
-  return join(homedir(), '.age-of-agents', 'model-config.json');
+  return join(homedir(), '.agent-hollow', 'model-config.json');
 }
 
 const cache = new Map<string, ModelConfig>();

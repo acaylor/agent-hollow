@@ -1,6 +1,6 @@
 // Dev-entry: w trybie deweloperskim klienta serwuje Vite (proxy na /ws, /hooks...).
 // npm distribution uses src/cli.ts (with webRoot). Do NOT pass webRoot here.
-import { SERVER_PORT } from '@agent-citadel/shared';
+import { SERVER_PORT } from '@agent-hollow/shared';
 import { startServer } from './server.js';
 
 // Safety net: a single unhandled error must not shut down the visualization
@@ -14,5 +14,5 @@ process.on('uncaughtException', (err) => {
 
 const demo = process.argv.includes('--demo');
 const server = await startServer({ port: SERVER_PORT, host: '127.0.0.1', demo });
-console.log(`Age of Agents server (dev): ${server.url} (ws: /ws)`);
+console.log(`Agent Hollow server (dev): ${server.url} (ws: /ws)`);
 if (demo) console.log('Demo mode: scenario generator started');

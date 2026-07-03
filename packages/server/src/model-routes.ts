@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify';
-import { DEFAULT_MODEL_CONFIG, validateModelConfig, type ModelConfig } from '@agent-citadel/shared';
+import { DEFAULT_MODEL_CONFIG, validateModelConfig, type ModelConfig } from '@agent-hollow/shared';
 import { loadModelConfig, saveModelConfig } from './model-config.js';
 
 export interface ModelRoutesOptions {
   /** true → PUT zapisuje na dysk; false (demo) → tylko waliduje i echo. */
   persist: boolean;
-  /** File path when persistent. Defaults to ~/.age-of-agents/model-config.json. */
+  /** File path when persistent. Defaults to ~/.agent-hollow/model-config.json. */
   modelConfigPath?: string;
 }
 

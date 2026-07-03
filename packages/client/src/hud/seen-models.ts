@@ -1,4 +1,4 @@
-import type { AgentKind, HeroSnapshot } from '@agent-citadel/shared';
+import type { AgentKind, HeroSnapshot } from '@agent-hollow/shared';
 
 /** Jeden widziany model + zbiór providerów, pod którymi go uruchamiano (do herbów). */
 export interface SeenModel {

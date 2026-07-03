@@ -72,8 +72,8 @@ export class DockerPoller {
 
   async start(): Promise<void> {
     if (this.running) return;
-    if (process.env.AGENTCRAFT_DOCKER === '0') {
-      console.log('[Docker] Poller wyłączony (AGENTCRAFT_DOCKER=0)');
+    if (process.env.HOLLOW_DOCKER === '0') {
+      console.log('[Docker] Poller wyłączony (HOLLOW_DOCKER=0)');
       return;
     }
     this.running = true;

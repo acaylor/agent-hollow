@@ -15,13 +15,13 @@ process.on('uncaughtException', (err) => {
   console.error('Uncaught exception — server keeps running:', err);
 });
 
-const HELP = `Age of Agents — visualize Claude Code sessions as an RTS game.
+const HELP = `Agent Hollow — visualize Claude Code sessions as an RTS game.
 
 Usage:
-  age-of-agents [options]
-  aoa [options]
-  aoa local <model> [args]   Run \`ollama run <model>\` and log it as a hero
-  aoa local-proxy            OpenAI /v1 logging proxy (llama.cpp/vLLM/oMLX)
+  agent-hollow [options]
+  hollow [options]
+  hollow local <model> [args]   Run \`ollama run <model>\` and log it as a hero
+  hollow local-proxy            OpenAI /v1 logging proxy (llama.cpp/vLLM/oMLX)
 
 By default opens the browser on the game view after startup (skipped in CI / without a TTY).
 
@@ -51,13 +51,13 @@ function openBrowser(url: string): void {
 async function runLocal(rest: string[]): Promise<number> {
   const model = rest[0];
   if (!model) {
-    process.stderr.write('Usage: aoa local <model> [ollama run args…]\n');
+    process.stderr.write('Usage: hollow local <model> [ollama run args…]\n');
     return 1;
   }
   const proxy = await startOllamaLoggerProxy();
   // `ollama` reads OLLAMA_HOST as "host:port" (no scheme).
   const ollamaHost = proxy.url.replace(/^https?:\/\//, '');
-  process.stdout.write(`  ▸ Logging this session to Age of Agents (proxy ${proxy.url})\n\n`);
+  process.stdout.write(`  ▸ Logging this session to Agent Hollow (proxy ${proxy.url})\n\n`);
   const child = spawn('ollama', ['run', ...rest], {
     stdio: 'inherit',
     env: { ...process.env, OLLAMA_HOST: ollamaHost },
@@ -112,7 +112,7 @@ async function main(): Promise<void> {
     try {
       const server = await startServer({ port, demo: opts.demo, webRoot });
       process.stdout.write(
-        `\n  ▸ Age of Agents is running: ${server.url}\n    (Ctrl+C to stop)\n\n`,
+        `\n  ▸ Agent Hollow is running: ${server.url}\n    (Ctrl+C to stop)\n\n`,
       );
       const open = shouldOpenBrowser(opts.open, {
         ci: Boolean(process.env.CI),

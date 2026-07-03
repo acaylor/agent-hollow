@@ -10,7 +10,7 @@ import {
   type BuildingStatsResponse,
   type BuildingWindowStats,
   type MappingConfig,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 import { loadMappingConfig } from './mapping-config.js';
 import { codexQualifiedToolName, codexToolToCanonical } from './sources/codex.js';
 

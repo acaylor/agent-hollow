@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GameEvent, HeroSnapshot, MissionSnapshot, PeonSnapshot, TranscriptLine } from '@agent-citadel/shared';
+import type { GameEvent, HeroSnapshot, MissionSnapshot, PeonSnapshot, TranscriptLine } from '@agent-hollow/shared';
 import { SessionTracker } from '../src/state-machine.js';
 import { DockerPoller } from '../src/sources/docker-poller.js';
 import type { ContainerInfo, DockerClient, ExecResult } from '../src/sources/docker-client.js';
@@ -250,9 +250,9 @@ describe('DockerPoller', () => {
     expect(world.snapshot().heroes).toHaveLength(0);
   });
 
-  it('AGENTCRAFT_DOCKER=0 → start() jest no-opem', async () => {
-    const prev = process.env.AGENTCRAFT_DOCKER;
-    process.env.AGENTCRAFT_DOCKER = '0';
+  it('HOLLOW_DOCKER=0 → start() jest no-opem', async () => {
+    const prev = process.env.HOLLOW_DOCKER;
+    process.env.HOLLOW_DOCKER = '0';
     try {
       const world = makeWorld();
       const client = new FakeDockerClient(true, [{ id: 'abc123', name: 'devbox', image: 'node:20' }], {
@@ -263,8 +263,8 @@ describe('DockerPoller', () => {
       poller.stop();
       expect(world.snapshot().heroes).toHaveLength(0);
     } finally {
-      if (prev === undefined) delete process.env.AGENTCRAFT_DOCKER;
-      else process.env.AGENTCRAFT_DOCKER = prev;
+      if (prev === undefined) delete process.env.HOLLOW_DOCKER;
+      else process.env.HOLLOW_DOCKER = prev;
     }
   });
 

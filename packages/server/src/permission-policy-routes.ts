@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify';
-import { DEFAULT_PERMISSION_POLICY, validatePermissionPolicy, type PermissionPolicy } from '@agent-citadel/shared';
+import { DEFAULT_PERMISSION_POLICY, validatePermissionPolicy, type PermissionPolicy } from '@agent-hollow/shared';
 import { loadPermissionPolicy, savePermissionPolicy } from './permission-policy.js';
 
 export interface PermissionPolicyRoutesOptions {
   /** true -> PUT writes to disk (source of truth); false (demo) -> only validate and echo. */
   persist: boolean;
-  /** File path when persistent. Defaults to ~/.age-of-agents/permission-policy.json. */
+  /** File path when persistent. Defaults to ~/.agent-hollow/permission-policy.json. */
   policyPath?: string;
 }
 

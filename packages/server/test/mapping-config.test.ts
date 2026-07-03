@@ -3,10 +3,10 @@ import { mkdtempSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadMappingConfig, saveMappingConfig, invalidateMappingCache } from '../src/mapping-config.js';
-import { DEFAULT_MAPPING, type MappingConfig } from '@agent-citadel/shared';
+import { DEFAULT_MAPPING, type MappingConfig } from '@agent-hollow/shared';
 
 function tmpPath(name = 'tool-mapping.json'): string {
-  return join(mkdtempSync(join(tmpdir(), 'aoa-map-')), name);
+  return join(mkdtempSync(join(tmpdir(), 'hollow-map-')), name);
 }
 
 beforeEach(() => invalidateMappingCache());
@@ -38,7 +38,7 @@ describe('loadMappingConfig', () => {
 
 describe('saveMappingConfig', () => {
   it('creates missing directory and saves file', async () => {
-    const p = join(mkdtempSync(join(tmpdir(), 'aoa-map-')), 'nested', 'tool-mapping.json');
+    const p = join(mkdtempSync(join(tmpdir(), 'hollow-map-')), 'nested', 'tool-mapping.json');
     const custom: MappingConfig = { rules: [{ kind: 'prefix', prefix: 'mcp__', building: 'guild' }], fallback: 'citadel' };
     const saved = await saveMappingConfig(custom, p);
     expect(saved).toEqual(custom);

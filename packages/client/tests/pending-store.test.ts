@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useWorld } from '../src/store';
-import type { PendingQuestion } from '@agent-citadel/shared';
+import type { PendingQuestion } from '@agent-hollow/shared';
 
 const q = (id: string, sessionId: string): PendingQuestion => ({
   id, sessionId, source: 'hook', kind: 'tool-permission', tool: 'Bash', detail: 'rm', createdAt: '2026-06-21T00:00:00Z',

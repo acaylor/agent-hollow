@@ -1,4 +1,4 @@
-import type { LaunchAgentRequest } from '@agent-citadel/shared';
+import type { LaunchAgentRequest } from '@agent-hollow/shared';
 import { apiFetch } from './api';
 
 const RECENT_KEY = 'agent-citadel.recent-dirs';

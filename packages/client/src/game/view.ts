@@ -1,6 +1,6 @@
 import { Application, Container, Graphics, Sprite, TextureStyle } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
-import type { HeroSnapshot, MissionSnapshot, PeonSnapshot } from '@agent-citadel/shared';
+import type { HeroSnapshot, MissionSnapshot, PeonSnapshot } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { resolveBuildingLive, useMapping } from '../mapping-store';
 import type { BuildingDef, BuildingId, ThemeDef } from '../theme/types';

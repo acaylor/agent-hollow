@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AGENT_PROVIDERS, resolveProvider } from '@agent-citadel/shared';
+import { AGENT_PROVIDERS, resolveProvider } from '@agent-hollow/shared';
 
 describe('local-llm provider', () => {
   it('is registered in AGENT_PROVIDERS', () => {

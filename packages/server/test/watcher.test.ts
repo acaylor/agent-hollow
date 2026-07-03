@@ -103,7 +103,7 @@ describe('SourceWatcher - subagents from source metadata', () => {
   });
 
   it('file classified as a session can be rerouted to a peon after subagent-meta', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'aoa-watcher-'));
+    const dir = await mkdtemp(join(tmpdir(), 'hollow-watcher-'));
     const world = new World();
     const source: AgentSource = {
       id: 'codex',
@@ -140,7 +140,7 @@ describe('SourceWatcher - subagents from source metadata', () => {
   });
 
   it('large existing Codex subagent files keep peon routing after tailing from the end', async () => {
-    const dir = await mkdtemp(join(tmpdir(), 'aoa-watcher-large-'));
+    const dir = await mkdtemp(join(tmpdir(), 'hollow-watcher-large-'));
     const file = join(dir, 'rollout-child-session.jsonl');
     const world = new World();
     const source: AgentSource = {
@@ -193,8 +193,8 @@ describe('SourceWatcher - subagents from source metadata', () => {
 
 describe('SourceWatcher - root refresh', () => {
   it('adds new roots during sweep without removing old ones', () => {
-    const dir1 = '/virtual/aoa-watcher-root-a';
-    const dir2 = '/virtual/aoa-watcher-root-b';
+    const dir1 = '/virtual/hollow-watcher-root-a';
+    const dir2 = '/virtual/hollow-watcher-root-b';
     const world = new World();
     let roots = [dir1];
     const source: AgentSource = {
@@ -227,12 +227,12 @@ describe('applyExternalFacts - /clear strike routing', () => {
   it('routes cleared to the existing hero in the same cwd, not the new session', () => {
     const world = new World();
     const watcher = new SourceWatcher(world, stubSource);
-    const cwd = '/home/lachlan/age-of-agents';
+    const cwd = '/home/lachlan/agent-hollow';
 
-    watcher.applyExternalFacts('old-session', 'age-of-agents', [{ kind: 'meta', cwd }]);
+    watcher.applyExternalFacts('old-session', 'agent-hollow', [{ kind: 'meta', cwd }]);
     watcher.applyExternalFacts(
       'new-session',
-      'age-of-agents',
+      'agent-hollow',
       [
         { kind: 'meta', cwd },
         { kind: 'cleared', ts: new Date().toISOString() },
@@ -248,8 +248,8 @@ describe('applyExternalFacts - /clear strike routing', () => {
     const world = new World();
     const watcher = new SourceWatcher(world, stubSource);
 
-    watcher.applyExternalFacts('solo-session', 'age-of-agents', [
-      { kind: 'meta', cwd: '/home/lachlan/age-of-agents' },
+    watcher.applyExternalFacts('solo-session', 'agent-hollow', [
+      { kind: 'meta', cwd: '/home/lachlan/agent-hollow' },
       { kind: 'cleared', ts: new Date().toISOString() },
     ]);
 

@@ -1,5 +1,5 @@
 import { Assets, type Texture } from 'pixi.js';
-import type { AgentKind } from '@agent-citadel/shared';
+import type { AgentKind } from '@agent-hollow/shared';
 import { emblemSrc } from '../theme/emblems';
 
 /**

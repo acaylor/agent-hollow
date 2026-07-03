@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { resolveBuilding, type BuildingId, type BuildingStatsResponse, type BuildingWindowStats } from '@agent-citadel/shared';
+import { resolveBuilding, type BuildingId, type BuildingStatsResponse, type BuildingWindowStats } from '@agent-hollow/shared';
 import { useWorld } from '../store';
 import { useMapping } from '../mapping-store';
 import { useSettings } from '../settings';

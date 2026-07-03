@@ -1,4 +1,4 @@
-import type { HeroSnapshot, HeroStateKind } from '@agent-citadel/shared';
+import type { HeroSnapshot, HeroStateKind } from '@agent-hollow/shared';
 import type { World } from '../world.js';
 
 /**

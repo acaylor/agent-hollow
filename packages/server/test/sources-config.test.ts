@@ -29,7 +29,7 @@ describe('sources config', () => {
   });
 
   it('parseSourceFilter rejects unknown source ids', () => {
-    expect(() => parseSourceFilter('codex,nope')).toThrow('Unknown AOA_SOURCES value: nope');
+    expect(() => parseSourceFilter('codex,nope')).toThrow('Unknown HOLLOW_SOURCES value: nope');
   });
 
   it('filterSources keeps only selected sources when a filter is provided', () => {
@@ -40,8 +40,8 @@ describe('sources config', () => {
   it('parseCodexLookbackDays defaults to 1 and rejects invalid values', () => {
     expect(parseCodexLookbackDays(undefined)).toBe(1);
     expect(parseCodexLookbackDays('3')).toBe(3);
-    expect(() => parseCodexLookbackDays('0')).toThrow('Invalid AOA_CODEX_LOOKBACK_DAYS');
-    expect(() => parseCodexLookbackDays('abc')).toThrow('Invalid AOA_CODEX_LOOKBACK_DAYS');
+    expect(() => parseCodexLookbackDays('0')).toThrow('Invalid HOLLOW_CODEX_LOOKBACK_DAYS');
+    expect(() => parseCodexLookbackDays('abc')).toThrow('Invalid HOLLOW_CODEX_LOOKBACK_DAYS');
   });
 
   it('codexDateRoots returns yesterday, today, and tomorrow for default lookback', () => {
@@ -54,7 +54,7 @@ describe('sources config', () => {
   });
 
   it('rootIfExists returns [] for missing directories', () => {
-    expect(rootIfExists('/definitely/missing/age-of-agents-test-root')).toEqual([]);
+    expect(rootIfExists('/definitely/missing/agent-hollow-test-root')).toEqual([]);
   });
 
   it('rootIfExists returns [] when filesystem checks throw', async () => {
@@ -77,7 +77,7 @@ describe('sources config', () => {
 });
 
 describe('activeSources', () => {
-  it('uses AOA_SOURCES-style filtering over registered sources', () => {
+  it('uses HOLLOW_SOURCES-style filtering over registered sources', () => {
     expect(activeSources('codex').map((s) => s.id)).toEqual(['codex']);
     expect(activeSources('claude,codex').map((s) => s.id)).toEqual(['claude', 'codex']);
   });

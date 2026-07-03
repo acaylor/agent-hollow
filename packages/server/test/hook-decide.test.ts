@@ -3,7 +3,7 @@ import { World } from '../src/world.js';
 import { PendingRegistry } from '../src/pending-registry.js';
 import { decideHook } from '../src/hook-decide.js';
 import { decisionToHookOutput } from '../src/hooks.js';
-import type { PermissionPolicy } from '@agent-citadel/shared';
+import type { PermissionPolicy } from '@agent-hollow/shared';
 
 const on = (rules: PermissionPolicy['rules'] = []): PermissionPolicy => ({ enabled: true, rules });
 

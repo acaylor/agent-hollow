@@ -4,7 +4,7 @@ import {
   pickSprite,
   DEFAULT_MODEL_CONFIG,
   type ModelConfig,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 
 const MULTI: ModelConfig = {
   sprites: [

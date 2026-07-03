@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "types": ["node"],
     "paths": {
-      "@agent-citadel/shared": ["../shared/src/index.ts"]
+      "@agent-hollow/shared": ["../shared/src/index.ts"]
     }
   },
   "include": ["src", "test"]

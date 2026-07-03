@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useWorld } from '../src/store';
-import type { ProjectArsenal, TranscriptLine } from '@agent-citadel/shared';
+import type { ProjectArsenal, TranscriptLine } from '@agent-hollow/shared';
 
 beforeEach(() => {
   useWorld.setState({ autofollow: false, selectedSessionId: undefined, selectedBuildingId: undefined, heroes: {} });

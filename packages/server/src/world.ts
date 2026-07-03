@@ -6,7 +6,7 @@ import type {
   ProjectArsenal,
   TranscriptLine,
   WorldSnapshot,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 
 type Listener = (event: GameEvent) => void;
 const TRANSCRIPT_BUFFER = 200;

@@ -5,17 +5,17 @@ import {
   DEFAULT_PERMISSION_POLICY,
   validatePermissionPolicy,
   type PermissionPolicy,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 
 /**
  * Persistence for the permission policy that drives panel-based answering.
- * Source of truth: `~/.age-of-agents/permission-policy.json`. Missing or damaged
+ * Source of truth: `~/.agent-hollow/permission-policy.json`. Missing or damaged
  * files fall back to DEFAULT_PERMISSION_POLICY (disabled), so the app stays a
  * passive observer until the user explicitly turns the feature on.
  */
 
 export function defaultPolicyPath(): string {
-  return join(homedir(), '.age-of-agents', 'permission-policy.json');
+  return join(homedir(), '.agent-hollow', 'permission-policy.json');
 }
 
 const cache = new Map<string, PermissionPolicy>();

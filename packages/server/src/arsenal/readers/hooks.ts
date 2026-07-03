@@ -1,6 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type { ArsenalHook, ArsenalOrigin } from '@agent-citadel/shared';
+import type { ArsenalHook, ArsenalOrigin } from '@agent-hollow/shared';
 
 interface Opts { workingDir: string; homeDir: string; }
 

@@ -5,16 +5,16 @@ import { join } from 'node:path';
 import { startServer } from '../src/server.js';
 
 let server: Awaited<ReturnType<typeof startServer>> | undefined;
-afterEach(async () => { await server?.close(); server = undefined; delete process.env.AOA_ALLOW_REMOTE; });
-function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'aoa-bind-')), 'session-token'); }
+afterEach(async () => { await server?.close(); server = undefined; delete process.env.HOLLOW_ALLOW_REMOTE; });
+function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'hollow-bind-')), 'session-token'); }
 
 describe('non-loopback bind safeguard', () => {
   it('refuses a non-loopback host by default', async () => {
     await expect(startServer({ port: 0, demo: true, host: '0.0.0.0', tokenPath: tokenPath() }))
       .rejects.toThrow(/non-loopback/i);
   });
-  it('allows it with AOA_ALLOW_REMOTE=1', async () => {
-    process.env.AOA_ALLOW_REMOTE = '1';
+  it('allows it with HOLLOW_ALLOW_REMOTE=1', async () => {
+    process.env.HOLLOW_ALLOW_REMOTE = '1';
     server = await startServer({ port: 0, demo: true, host: '0.0.0.0', tokenPath: tokenPath() });
     expect(server.port).toBeGreaterThan(0);
   });

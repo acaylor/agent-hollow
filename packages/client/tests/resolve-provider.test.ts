@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { AGENT_PROVIDERS, resolveProvider, type ProviderInfo } from '../src/theme/providers';
-import type { AgentKind } from '@agent-citadel/shared';
+import type { AgentKind } from '@agent-hollow/shared';
 
 /**
  * Jedno źródło prawdy o providerach: tablica AGENT_PROVIDERS (agent → herb)

@@ -3,10 +3,10 @@ import { mkdtempSync, writeFileSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { loadModelConfig, saveModelConfig, invalidateModelConfigCache } from '../src/model-config.js';
-import { DEFAULT_MODEL_CONFIG, type ModelConfig } from '@agent-citadel/shared';
+import { DEFAULT_MODEL_CONFIG, type ModelConfig } from '@agent-hollow/shared';
 
 function tmpPath(name = 'model-config.json'): string {
-  return join(mkdtempSync(join(tmpdir(), 'aoa-model-')), name);
+  return join(mkdtempSync(join(tmpdir(), 'hollow-model-')), name);
 }
 
 beforeEach(() => invalidateModelConfigCache());
@@ -54,7 +54,7 @@ describe('loadModelConfig', () => {
 
 describe('saveModelConfig', () => {
   it('creates directory, saves, load returns new config', async () => {
-    const p = join(mkdtempSync(join(tmpdir(), 'aoa-model-')), 'nested', 'model-config.json');
+    const p = join(mkdtempSync(join(tmpdir(), 'hollow-model-')), 'nested', 'model-config.json');
     const saved = await saveModelConfig(CUSTOM, p);
     expect(saved).toMatchObject(CUSTOM);
     expect(existsSync(p)).toBe(true);

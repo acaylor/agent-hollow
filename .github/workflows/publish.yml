@@ -1,6 +1,6 @@
 name: Publish to npm
 
-# Publikuje paczkę `age-of-agents` na npm po wypchnięciu taga wersji (np. v0.1.1).
+# Publikuje paczkę `agent-hollow` na npm po wypchnięciu taga wersji (np. v0.1.1).
 # Token NIE jest w tym pliku — pochodzi z sekretu repozytorium NPM_TOKEN
 # (Settings → Secrets and variables → Actions). Użyj tokenu typu "Automation"
 # (omija 2FA w CI). Przepływ wydania:

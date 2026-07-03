@@ -7,7 +7,7 @@ import {
   validateQuestionAnswer,
   DEFAULT_PERMISSION_POLICY,
   type PermissionPolicy,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 
 const enabled = (rules: PermissionPolicy['rules'] = []): PermissionPolicy => ({ enabled: true, rules });
 

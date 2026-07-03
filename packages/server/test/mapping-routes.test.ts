@@ -5,10 +5,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { registerMappingRoutes } from '../src/mapping-routes.js';
 import { invalidateMappingCache } from '../src/mapping-config.js';
-import { DEFAULT_MAPPING } from '@agent-citadel/shared';
+import { DEFAULT_MAPPING } from '@agent-hollow/shared';
 
 function tmpPath(): string {
-  return join(mkdtempSync(join(tmpdir(), 'aoa-routes-')), 'tool-mapping.json');
+  return join(mkdtempSync(join(tmpdir(), 'hollow-routes-')), 'tool-mapping.json');
 }
 
 beforeEach(() => invalidateMappingCache());

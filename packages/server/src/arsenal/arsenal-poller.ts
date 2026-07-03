@@ -1,5 +1,5 @@
 import os from 'node:os';
-import type { ProjectArsenal } from '@agent-citadel/shared';
+import type { ProjectArsenal } from '@agent-hollow/shared';
 import type { World } from '../world.js';
 import { readSkills } from './readers/skills.js';
 import { readConnectors } from './readers/connectors.js';

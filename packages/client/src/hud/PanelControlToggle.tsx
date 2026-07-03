@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { PermissionPolicy } from '@agent-citadel/shared';
+import type { PermissionPolicy } from '@agent-hollow/shared';
 import { useUi } from '../i18n';
 import { apiFetch } from '../api';
 

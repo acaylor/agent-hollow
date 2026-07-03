@@ -5,10 +5,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { registerModelRoutes } from '../src/model-routes.js';
 import { invalidateModelConfigCache } from '../src/model-config.js';
-import { DEFAULT_MODEL_CONFIG } from '@agent-citadel/shared';
+import { DEFAULT_MODEL_CONFIG } from '@agent-hollow/shared';
 
 function tmpPath(): string {
-  return join(mkdtempSync(join(tmpdir(), 'aoa-modelroutes-')), 'model-config.json');
+  return join(mkdtempSync(join(tmpdir(), 'hollow-modelroutes-')), 'model-config.json');
 }
 
 beforeEach(() => invalidateModelConfigCache());

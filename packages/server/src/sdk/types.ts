@@ -1,4 +1,4 @@
-import type { SdkPermissionMode } from '@agent-citadel/shared';
+import type { SdkPermissionMode } from '@agent-hollow/shared';
 
 export interface LaunchParams {
   cwd: string;

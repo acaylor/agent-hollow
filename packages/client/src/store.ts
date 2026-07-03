@@ -7,7 +7,7 @@ import type {
   PeonSnapshot,
   ProjectArsenal,
   TranscriptLine,
-} from '@agent-citadel/shared';
+} from '@agent-hollow/shared';
 import { deriveNotification, DEDUP_WINDOW, MAX_VISIBLE, type Notification } from './notifications';
 
 interface WorldStore {

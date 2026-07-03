@@ -3,14 +3,14 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import WebSocket from 'ws';
-import { WS_PATH } from '@agent-citadel/shared';
+import { WS_PATH } from '@agent-hollow/shared';
 import { startServer } from '../src/server.js';
 
-beforeAll(() => { process.env.AOA_SOURCES = 'claude'; });
+beforeAll(() => { process.env.HOLLOW_SOURCES = 'claude'; });
 let server: Awaited<ReturnType<typeof startServer>> | undefined;
 afterEach(async () => { await server?.close(); server = undefined; });
 
-function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'aoa-ws-')), 'session-token'); }
+function tokenPath() { return join(mkdtempSync(join(tmpdir(), 'hollow-ws-')), 'session-token'); }
 const wsUrl = (base: string, q = '') => `${base.replace('http', 'ws')}${WS_PATH}${q}`;
 
 /** Resolves 'open'|'error' for a socket so we can assert accept/reject. */

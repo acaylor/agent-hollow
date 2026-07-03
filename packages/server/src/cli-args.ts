@@ -1,4 +1,4 @@
-import { SERVER_PORT } from '@agent-citadel/shared';
+import { SERVER_PORT } from '@agent-hollow/shared';
 
 /**
  * Browser opening mode:

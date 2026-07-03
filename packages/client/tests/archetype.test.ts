@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { sessionToArchetypeKey, stateToAnimation, archetypeKeyChain } from '../src/game/archetype';
-import type { HeroSnapshot } from '@agent-citadel/shared';
+import type { HeroSnapshot } from '@agent-hollow/shared';
 
 describe('sessionToArchetypeKey - sprite override', () => {
   const base = { permissionMode: 'default' } as HeroSnapshot;

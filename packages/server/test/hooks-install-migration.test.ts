@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { installHooks, hooksStatus, uninstallHooks, DECIDE_TIMEOUT_SEC } from '../src/hooks.js';
 
 function tmpSettings(initial: unknown): string {
-  const p = join(mkdtempSync(join(tmpdir(), 'aoa-hooks-')), 'settings.json');
+  const p = join(mkdtempSync(join(tmpdir(), 'hollow-hooks-')), 'settings.json');
   if (initial !== undefined) writeFileSync(p, JSON.stringify(initial, null, 2));
   return p;
 }
@@ -27,7 +27,7 @@ describe('installHooks migration', () => {
 
   it('repairs a stale (timeout:1) PreToolUse entry instead of skipping it', async () => {
     // Simulate an old install: our marker command but the fast timeout.
-    const staleCmd = "node -e \"const marker='age-of-agents-hook-shim'\"";
+    const staleCmd = "node -e \"const marker='agent-hollow-hook-shim'\"";
     const p = tmpSettings({ hooks: { PreToolUse: [{ matcher: '*', hooks: [{ type: 'command', command: staleCmd, timeout: 1 }] }] } });
     expect((await hooksStatus(p)).needsMigration).toBe(true); // flagged before repair
 
@@ -35,7 +35,7 @@ describe('installHooks migration', () => {
 
     const entries = pre(p);
     // Exactly one of our entries, now with the long timeout + blocking shim.
-    const ourEntries = entries.filter((e: any) => e.hooks.some((h: any) => h.command?.includes('age-of-agents-hook-shim') || h.command?.includes('/hooks/decide')));
+    const ourEntries = entries.filter((e: any) => e.hooks.some((h: any) => h.command?.includes('agent-hollow-hook-shim') || h.command?.includes('/hooks/decide')));
     expect(ourEntries).toHaveLength(1);
     expect(ourEntries[0].hooks[0].timeout).toBe(DECIDE_TIMEOUT_SEC);
     expect((await hooksStatus(p)).needsMigration).toBe(false); // no longer stuck

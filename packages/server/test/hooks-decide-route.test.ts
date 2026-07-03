@@ -3,17 +3,17 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import WebSocket from 'ws';
-import { WS_PATH, type GameEvent, type PendingQuestion } from '@agent-citadel/shared';
+import { WS_PATH, type GameEvent, type PendingQuestion } from '@agent-hollow/shared';
 import { startServer } from '../src/server.js';
 
 // Limit watchers to keep the real-mode server light in tests.
-beforeAll(() => { process.env.AOA_SOURCES = 'claude'; });
+beforeAll(() => { process.env.HOLLOW_SOURCES = 'claude'; });
 
 let server: Awaited<ReturnType<typeof startServer>> | undefined;
 afterEach(async () => { await server?.close(); server = undefined; });
 
 function policyFile(enabled: boolean): string {
-  const p = join(mkdtempSync(join(tmpdir(), 'aoa-pol-')), 'permission-policy.json');
+  const p = join(mkdtempSync(join(tmpdir(), 'hollow-pol-')), 'permission-policy.json');
   writeFileSync(p, JSON.stringify({ enabled, rules: [] }));
   return p;
 }

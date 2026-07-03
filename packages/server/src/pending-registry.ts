@@ -1,5 +1,5 @@
 import type { World } from './world.js';
-import type { PendingQuestion, QuestionAnswer, QuestionDecision } from '@agent-citadel/shared';
+import type { PendingQuestion, QuestionAnswer, QuestionDecision } from '@agent-hollow/shared';
 
 interface Entry {
   question: PendingQuestion;

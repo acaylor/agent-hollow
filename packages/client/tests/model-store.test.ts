@@ -63,7 +63,7 @@ describe('useModels store', () => {
     useModels.getState().setModels(invalid);
     expect(useModels.getState().models).toEqual(invalid); // live state (editor shows the row)
     expect(f).not.toHaveBeenCalled(); // do not PUT garbage
-    expect(store['age-of-agents.models']).toBeUndefined(); // do not poison localStorage
+    expect(store['agent-hollow.models']).toBeUndefined(); // do not poison localStorage
   });
   it('hydrate loads config from GET', async () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(new Response(JSON.stringify(CUSTOM)))));

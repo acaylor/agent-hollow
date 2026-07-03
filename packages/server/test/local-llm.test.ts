@@ -83,10 +83,10 @@ describe('localLlmSessionsDir', () => {
     expect(localLlmSessionsDir()).toBe('/custom/sessions/path');
   });
 
-  it('returns default ~/.age-of-agents/local-llm/sessions path when env var is unset', () => {
+  it('returns default ~/.agent-hollow/local-llm/sessions path when env var is unset', () => {
     delete process.env.LOCAL_LLM_SESSIONS_DIR;
     const result = localLlmSessionsDir();
-    expect(result).toMatch(/\.age-of-agents[/\\]local-llm[/\\]sessions$/);
+    expect(result).toMatch(/\.agent-hollow[/\\]local-llm[/\\]sessions$/);
   });
 });
 

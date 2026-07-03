@@ -4,7 +4,7 @@ import { join, dirname } from 'node:path';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 
 export function tokenFilePath(): string {
-  return join(homedir(), '.age-of-agents', 'session-token');
+  return join(homedir(), '.agent-hollow', 'session-token');
 }
 
 /**

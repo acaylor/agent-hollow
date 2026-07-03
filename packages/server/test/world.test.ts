@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { HeroSnapshot, ProjectArsenal } from '@agent-citadel/shared';
+import type { HeroSnapshot, ProjectArsenal } from '@agent-hollow/shared';
 import { World } from '../src/world.js';
 
 function arsenal(projectDir: string): ProjectArsenal {

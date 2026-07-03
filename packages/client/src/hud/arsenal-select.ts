@@ -1,4 +1,4 @@
-import type { HeroSnapshot, WieldedArsenal } from '@agent-citadel/shared';
+import type { HeroSnapshot, WieldedArsenal } from '@agent-hollow/shared';
 
 /** Bare skill name (cuts plugin namespace: 'superpowers:brainstorming' -> 'brainstorming'). */
 export function bareName(id: string): string {

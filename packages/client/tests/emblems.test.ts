@@ -3,7 +3,7 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { emblemSrc } from '../src/theme/emblems';
 import { ProviderEmblem } from '../src/hud/ProviderEmblem';
-import type { AgentKind } from '@agent-citadel/shared';
+import type { AgentKind } from '@agent-hollow/shared';
 
 /**
  * emblemSrc wyprowadza ścieżkę graficznego herba (Faza 2) z agenta, theme-agnostic.

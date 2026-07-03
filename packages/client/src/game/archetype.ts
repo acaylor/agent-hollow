@@ -1,5 +1,5 @@
-import type { HeroSnapshot, HeroStateKind } from '@agent-citadel/shared';
-import { SPRITE_IDS, type SpriteId } from '@agent-citadel/shared';
+import type { HeroSnapshot, HeroStateKind } from '@agent-hollow/shared';
+import { SPRITE_IDS, type SpriteId } from '@agent-hollow/shared';
 
 /** Animation tracks generated for each character (1 direction = south + mirroring). */
 export type AnimationName = 'idle' | 'walk' | 'work';
