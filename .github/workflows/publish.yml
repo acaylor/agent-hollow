@@ -1,17 +1,17 @@
 name: Publish to npm
 
 # Publishes the `agent-hollow` package to npm when a version tag is pushed
-# (e.g. v0.9.0). The token is NOT in this file — it comes from the NPM_TOKEN
-# repository secret (Settings → Secrets and variables → Actions). Use a
-# granular access token with read/write on this package (bypasses 2FA in CI).
+# (e.g. v0.9.0), using npm Trusted Publishing (OIDC) — no token, no secret.
+# npmjs.com must list this repo + workflow as the package's Trusted Publisher
+# (package → Settings → Trusted Publisher: acaylor/agent-hollow, publish.yml).
+#
+# Requirements: GitHub-hosted runner, `id-token: write`, npm >= 11.5.1
+# (Node 22 bundles an older npm, hence the upgrade step). Provenance
+# attestation is generated automatically with trusted publishing.
 #
 # Release flow:
 #   npm version minor        # bumps the version + creates tag vX.Y.Z
 #   git push && git push --tags
-#
-# `--provenance` attaches a signed attestation linking the published tarball
-# to this repo + workflow run (the "built and signed on GitHub Actions" badge
-# on npmjs.com). It needs the id-token: write permission below.
 on:
   push:
     tags:
@@ -22,15 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write # npm provenance attestation
+      id-token: write # OIDC exchange with npm (trusted publishing + provenance)
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
+      - run: npm install -g npm@latest # trusted publishing needs npm >= 11.5.1
       - run: npm ci
       # prepublishOnly in package.json runs the build + full test suite first.
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish
