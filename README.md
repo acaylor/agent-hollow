@@ -18,7 +18,7 @@ No combat, just a quiet realm you can watch at a glance.
 
 [**▶ Live site**](https://acaylor.github.io/agent-hollow/) · [Quick start](#-quick-start) · [How it works](#-how-it-works) · [Architecture](#-architecture)
 
-<img src="docs/screenshots/citadel-fantasy.png" alt="Agent Hollow — peaceful fantasy realm" width="820">
+<img src="docs/screenshots/citadel-fantasy.png" alt="Agent Hollow — the fantasy realm at night, windows aglow" width="820">
 
 </div>
 
@@ -44,7 +44,7 @@ A glanceable, second-monitor view of what your agents are quietly up to.
 
 | Fantasy | Sci-Fi |
 | --- | --- |
-| <img src="docs/screenshots/citadel-fantasy.png" alt="Fantasy realm" width="400"> | <img src="docs/screenshots/citadel-scifi.png" alt="Sci-fi colony" width="400"> |
+| <img src="docs/screenshots/citadel-fantasy.png" alt="Fantasy realm at night" width="400"> | <img src="docs/screenshots/citadel-scifi.png" alt="Sci-fi colony" width="400"> |
 
 **Session detail** — click a settler to inspect its task, token economy and live activity:
 
