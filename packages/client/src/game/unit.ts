@@ -1,6 +1,7 @@
 import { AnimatedSprite, Container, Graphics, Sprite, Text, type Spritesheet } from 'pixi.js';
 import { resolveProvider, type AgentKind, type HeroStateKind } from '@agent-hollow/shared';
 import { getEmblemTexture } from './emblems';
+import { emblemBackdrop } from '../theme/emblems';
 import type { Projection } from './projection';
 import type { PathNode } from './pathfind';
 import { buildUnitBody, labelStyle, teamColor } from './placeholders';
@@ -58,6 +59,7 @@ export class Unit {
     agent: AgentKind = 'claude',
     spriteScale: number = SPRITE_SCALE,
     spriteFootAnchor: number = SPRITE_FOOT_ANCHOR,
+    themeId = '',
   ) {
     this.gx = start.gx;
     this.gy = start.gy;
@@ -117,7 +119,7 @@ export class Unit {
 
     this.container.addChild(this.aura, this.selectionRing, this.teamRing, this.body, this.crate, this.contextBar, this.overlay, this.bubble, this.nameTag);
 
-    const badge = buildAgentBadge(agent);
+    const badge = buildAgentBadge(agent, themeId);
     if (badge) this.container.addChild(badge);
 
     this.syncScreen();
@@ -272,21 +274,28 @@ function clip(text: string, max: number): string {
 }
 
 /** Odznaka pochodzenia agenta przy głowie jednostki. Warstwa podstawowa: graficzny herb
- *  (tekstura z loadEmblems). Brak tekstury → fallback proceduralny: kółko + litera z
- *  AGENT_PROVIDERS (tylko nie-Claude; kolor CSS '#rrggbb' → liczba Pixi). */
-function buildAgentBadge(agent: AgentKind): Container | undefined {
+ *  (tekstura z loadEmblems), osadzony na tarczy (fantasy) / płytce hex (sci-fi) wg motywu.
+ *  Brak tekstury → fallback proceduralny: kółko + litera z AGENT_PROVIDERS
+ *  (tylko nie-Claude; kolor CSS '#rrggbb' → liczba Pixi). */
+function buildAgentBadge(agent: AgentKind, themeId = ''): Container | undefined {
   const provider = resolveProvider(agent);
   if (provider.color === null) return undefined;
 
   const c = new Container();
   c.position.set(10, -30); // przy głowie, prawy-górny róg jednostki
 
+  const backdrop = emblemBackdrop(themeId);
+  if (backdrop) c.addChild(drawEmblemPlate(backdrop));
+
   const tex = getEmblemTexture(provider.kind);
   if (tex) {
     const sprite = new Sprite(tex);
     sprite.anchor.set(0.5);
-    sprite.width = 22;
-    sprite.height = 22;
+    // Na płytce herb jest mniejszy, by zmieścić się w obrysie tarczy/hexa.
+    const size = backdrop ? 14 : 22;
+    sprite.width = size;
+    sprite.height = size;
+    if (backdrop?.shape === 'shield') sprite.position.y = -1; // nad "dziobem" tarczy
     c.addChild(sprite);
     return c;
   }
@@ -302,4 +311,22 @@ function buildAgentBadge(agent: AgentKind): Container | undefined {
   c.addChild(letter);
 
   return c;
+}
+
+/** Płytka pod herbem: tarcza heraldyczna (fantasy) albo hex (sci-fi). */
+function drawEmblemPlate(backdrop: { shape: 'shield' | 'hex'; fill: number; border: number }): Graphics {
+  const g = new Graphics();
+  if (backdrop.shape === 'shield') {
+    // Tarcza „heater": prosta góra, boki zbiegające do dzioba na dole.
+    g.poly([-9, -9, 9, -9, 9, 0, 0, 11, -9, 0])
+      .fill({ color: backdrop.fill, alpha: 0.95 })
+      .stroke({ color: 0x0b0b0a, width: 3, alpha: 0.6 });
+    g.poly([-9, -9, 9, -9, 9, 0, 0, 11, -9, 0]).stroke({ color: backdrop.border, width: 1.5, alpha: 0.95 });
+  } else {
+    // Hex flat-top.
+    const hex = [-5, -9, 5, -9, 10, 0, 5, 9, -5, 9, -10, 0];
+    g.poly(hex).fill({ color: backdrop.fill, alpha: 0.95 }).stroke({ color: 0x0b0b0a, width: 3, alpha: 0.6 });
+    g.poly(hex).stroke({ color: backdrop.border, width: 1.5, alpha: 0.95 });
+  }
+  return g;
 }

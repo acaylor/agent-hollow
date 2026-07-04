@@ -14,3 +14,22 @@ export function emblemSrc(agent: AgentKind | undefined): string | undefined {
   if (provider.color === null) return undefined;
   return `${EMBLEM_BASE}/${provider.kind}.png`;
 }
+
+/** Themed mount the map badge sits on (heraldry Phase 2, per-theme layer):
+ *  fantasy → heraldic shield, sci-fi → hex plate. Unknown theme → bare emblem. */
+export interface EmblemBackdrop {
+  shape: 'shield' | 'hex';
+  /** Plate fill (Pixi color). */
+  fill: number;
+  /** Plate border (Pixi color). */
+  border: number;
+}
+
+const BACKDROPS: Record<string, EmblemBackdrop> = {
+  fantasy: { shape: 'shield', fill: 0x2a2620, border: 0xe0b64a },
+  scifi: { shape: 'hex', fill: 0x101820, border: 0x64c8ff },
+};
+
+export function emblemBackdrop(themeId: string): EmblemBackdrop | undefined {
+  return BACKDROPS[themeId];
+}

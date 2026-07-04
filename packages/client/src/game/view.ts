@@ -465,7 +465,7 @@ export class GameView {
         const o = heroSpawnScatter(hero.sessionId);
         const door = { gx: home.door.gx + o.dx, gy: home.door.gy + o.dy };
         const sheet = getHeroSheet(sessionToArchetypeKey(hero, pickSpriteLive(hero.model)));
-        unit = new Unit(hero.sessionId, hero.teamColor, false, clipName(hero.title), door, this.theme.projection, sheet, hero.agent ?? 'claude', this.theme.heroSprite.scale, this.theme.heroSprite.footAnchor);
+        unit = new Unit(hero.sessionId, hero.teamColor, false, clipName(hero.title), door, this.theme.projection, sheet, hero.agent ?? 'claude', this.theme.heroSprite.scale, this.theme.heroSprite.footAnchor, this.theme.id);
         unit.setScreenFlipped(this.flipped);
         unit.container.eventMode = 'static';
         unit.container.cursor = 'pointer';

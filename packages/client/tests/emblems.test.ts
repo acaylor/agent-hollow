@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { emblemSrc } from '../src/theme/emblems';
+import { emblemSrc, emblemBackdrop } from '../src/theme/emblems';
 import { ProviderEmblem } from '../src/hud/ProviderEmblem';
 import type { AgentKind } from '@agent-hollow/shared';
 
@@ -23,6 +23,22 @@ describe('emblemSrc', () => {
 
   it('nieznany string → degraduje do claude bez herba', () => {
     expect(emblemSrc('gemini' as AgentKind)).toBeUndefined();
+  });
+});
+
+/**
+ * emblemBackdrop: płytka pod herbem na mapie zależy od motywu —
+ * fantasy = tarcza heraldyczna, sci-fi = hex; nieznany motyw = goły herb (jak dotąd).
+ */
+describe('emblemBackdrop', () => {
+  it('fantasy dostaje tarczę, sci-fi hex', () => {
+    expect(emblemBackdrop('fantasy')?.shape).toBe('shield');
+    expect(emblemBackdrop('scifi')?.shape).toBe('hex');
+  });
+
+  it('nieznany motyw → brak płytki (goły herb)', () => {
+    expect(emblemBackdrop('')).toBeUndefined();
+    expect(emblemBackdrop('western')).toBeUndefined();
   });
 });
 

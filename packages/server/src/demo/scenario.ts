@@ -16,13 +16,14 @@ interface Step {
 
 const LOOP_SECONDS = 58;
 
-function makeHero(world: World, sessionId: string, title: string): HeroSnapshot {
+function makeHero(world: World, sessionId: string, title: string, agent?: HeroSnapshot['agent']): HeroSnapshot {
   const now = new Date().toISOString();
   return {
     sessionId,
     title,
+    ...(agent ? { agent } : {}),
     projectDir: '/demo/project',
-    model: 'claude-fable-5',
+    model: agent === 'opencode' ? 'glm-5' : 'claude-fable-5',
     gitBranch: 'main',
     teamColor: world.claimTeamColor(),
     state: 'idle',
@@ -158,7 +159,8 @@ const TIMELINE: Step[] = [
 
 export function startDemo(world: World): void {
   world.upsertHero(makeHero(world, H1, 'Fix payments module'));
-  world.upsertHero(makeHero(world, H2, 'Report export'));
+  // The scout runs under OpenCode so the demo shows provider heraldry too.
+  world.upsertHero(makeHero(world, H2, 'Report export', 'opencode'));
 
   const startedAt = Date.now();
   const fired = new Set<string>();
