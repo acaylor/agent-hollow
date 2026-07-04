@@ -212,9 +212,12 @@ export function extractOpencodeMeta(sessionRow: Record<string, unknown>): { mode
   };
 }
 
-/** Path to OpenCode database. */
+/** Path to OpenCode database. OpenCode uses the XDG data dir on every
+ *  platform (macOS included), honoring XDG_DATA_HOME when set. */
 export function getOpencodeDbPath(): string {
-  return join(homedir(), '.local', 'share', 'opencode', 'opencode.db');
+  const xdg = process.env.XDG_DATA_HOME;
+  const base = xdg && xdg.trim() ? xdg : join(homedir(), '.local', 'share');
+  return join(base, 'opencode', 'opencode.db');
 }
 
 /**

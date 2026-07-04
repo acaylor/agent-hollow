@@ -1,5 +1,29 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import type { World } from '../src/world.js';
+import { getOpencodeDbPath } from '../src/sources/opencode.js';
+
+describe('getOpencodeDbPath', () => {
+  afterEach(() => {
+    delete process.env.XDG_DATA_HOME;
+  });
+
+  it('defaults to ~/.local/share on every platform (OpenCode convention)', () => {
+    delete process.env.XDG_DATA_HOME;
+    expect(getOpencodeDbPath()).toBe(join(homedir(), '.local', 'share', 'opencode', 'opencode.db'));
+  });
+
+  it('honors XDG_DATA_HOME when set', () => {
+    process.env.XDG_DATA_HOME = '/custom/data';
+    expect(getOpencodeDbPath()).toBe(join('/custom/data', 'opencode', 'opencode.db'));
+  });
+
+  it('ignores a blank XDG_DATA_HOME', () => {
+    process.env.XDG_DATA_HOME = '  ';
+    expect(getOpencodeDbPath()).toBe(join(homedir(), '.local', 'share', 'opencode', 'opencode.db'));
+  });
+});
 
 describe('OpenCodePoller', () => {
   afterEach(() => {
