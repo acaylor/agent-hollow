@@ -282,7 +282,10 @@ function buildAgentBadge(agent: AgentKind, themeId = ''): Container | undefined 
   if (provider.color === null) return undefined;
 
   const c = new Container();
-  c.position.set(10, -30); // przy głowie, prawy-górny róg jednostki
+  // Obok głowy (nie NA niej): wyżej i dalej w prawo, lekko pomniejszony,
+  // by tarcza/hex nie zasłaniały sprite'a bohatera.
+  c.position.set(17, -44);
+  c.scale.set(0.75);
 
   const backdrop = emblemBackdrop(themeId);
   if (backdrop) c.addChild(drawEmblemPlate(backdrop));

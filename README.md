@@ -97,7 +97,7 @@ small logging proxy. Two ways in:
 hollow local llama3        # wraps `ollama run llama3` and logs it as a hero
 ```
 
-The session shows up on the battlefield; the model appears in the **Modele** tab,
+The session shows up in the realm; the model appears in the **Models** tab,
 where you can assign a sprite (context window is read automatically from Ollama).
 
 **Any OpenAI-compatible backend (llama.cpp / vLLM / oMLX / coding agents):**
