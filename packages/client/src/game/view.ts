@@ -26,6 +26,7 @@ import { useSettings, type Lang } from '../settings';
 import { contextPct } from '../context-progress';
 import { daylightAt, localHour, parseHourOverride, DAY_TINT } from './daylight';
 import { getWindowLightTexture } from './building-lights';
+import { fireflyNests, fireflyAt, nextShootingStarDelay, shootingStarMotion, type FireflyNest } from './night-ambience';
 
 /** Target decoration width in tiles (for sprite scaling). */
 const DECO_W: Record<DecoKind, number> = { tree: 1.1, rock: 0.8, bush: 0.75, flower: 0.7 };
@@ -109,6 +110,12 @@ export class GameView {
   private duskOverlay?: Graphics;
   private buildingLights: { node: Sprite | Graphics; phase: number; base: number }[] = [];
   private hourOverride?: number; // ?hour= URL param (testing/screenshots)
+  private fireflies: { g: Graphics; nest: FireflyNest }[] = [];
+  /** Night FX above the dusk overlay — fireflies/stars must not be dimmed by it. */
+  private ambienceLayer = new Container();
+  private nightLevel = 0; // last daylight lights value (drives ambience)
+  private starAt = Infinity; // elapsed time of the next shooting star
+  private skyRect?: { minX: number; minY: number; maxX: number; maxY: number };
   private missionStatus = new Map<string, string>();
   private graph: WaypointGraph;
   private unsubscribe?: () => void;
@@ -289,6 +296,7 @@ export class GameView {
       this.updateBuildingFx(dt);
       this.updateParticles(dt);
       this.updateDaylight();
+      this.updateNightAmbience();
     });
 
     this.unsubscribe = useWorld.subscribe((state) =>
@@ -751,6 +759,80 @@ export class GameView {
       this.worldLayer.addChild(spill);
       this.buildingLights.push({ node: spill, phase, base: 0.22 });
     }
+
+    this.buildNightAmbience(rect);
+  }
+
+  /** Fireflies over the realm (warm embers on the sci-fi colony) + the
+   *  shooting-star timer. Nodes live above the night overlay so they shine. */
+  private buildNightAmbience(rect: { minX: number; minY: number; maxX: number; maxY: number }): void {
+    this.skyRect = rect;
+    this.worldLayer.addChild(this.ambienceLayer); // above the overlay + building lights
+    const color = this.theme.id === 'scifi' ? 0xffb066 : 0xcaff6e;
+    const rects = this.theme.buildings.map((b) => ({ gx: b.gx, gy: b.gy, w: b.w, h: b.h }));
+    for (const nest of fireflyNests(this.theme.grid, rects, 26)) {
+      const g = new Graphics();
+      g.circle(0, 0, 4.4).fill({ color, alpha: 0.3 }); // soft halo
+      g.circle(0, 0, 2.2).fill({ color, alpha: 0.5 });
+      g.rect(-1.2, -1.2, 2.4, 2.4).fill(color);
+      g.blendMode = 'add';
+      g.eventMode = 'none';
+      g.alpha = 0;
+      this.ambienceLayer.addChild(g);
+      this.fireflies.push({ g, nest });
+    }
+  }
+
+  /** Drift + blink the fireflies; launch a shooting star now and then. */
+  private updateNightAmbience(): void {
+    const night = Math.max(0, (this.nightLevel - 0.35) / 0.65); // ambience only after dusk settles
+    for (const { g, nest } of this.fireflies) {
+      if (night <= 0) {
+        g.visible = false;
+        continue;
+      }
+      g.visible = true;
+      const { dx, dy, glow } = fireflyAt(this.elapsed, nest);
+      const s = this.theme.projection.toScreen(nest.gx + dx, nest.gy + dy);
+      g.position.set(s.x, s.y - 10); // hovering just above the ground
+      g.alpha = glow * night;
+    }
+
+    if (night <= 0) {
+      this.starAt = Infinity; // reschedule at next dusk
+      return;
+    }
+    if (this.starAt === Infinity) this.starAt = this.elapsed + nextShootingStarDelay();
+    if (this.elapsed >= this.starAt) {
+      this.starAt = this.elapsed + nextShootingStarDelay();
+      this.spawnShootingStar();
+    }
+  }
+
+  /** A brief streak of light across the night realm. Spawned well inside the
+   *  world rect — the outer margin is cropped away at "cover" zoom, so a
+   *  star hugging the world's top edge would never be seen. */
+  private spawnShootingStar(): void {
+    if (!this.skyRect) return;
+    const { minX, minY, maxX, maxY } = this.skyRect;
+    const { vx, vy, life } = shootingStarMotion();
+    const x = minX + (0.2 + Math.random() * 0.6) * (maxX - minX);
+    const y = minY + (0.12 + Math.random() * 0.45) * (maxY - minY);
+    const len = 75 + Math.random() * 40;
+    const streak = new Graphics();
+    const speed = Math.hypot(vx, vy);
+    const tail = { x: (-vx / speed) * len, y: (-vy / speed) * len };
+    streak.poly([0, 0, tail.x, tail.y], false).stroke({ color: 0xbfe3ff, width: 5, alpha: 0.3 });
+    streak.poly([0, 0, tail.x * 0.6, tail.y * 0.6], false).stroke({ color: 0xffffff, width: 2.2, alpha: 0.95 });
+    streak.circle(0, 0, 3.2).fill({ color: 0xffffff, alpha: 0.95 });
+    streak.circle(0, 0, 6).fill({ color: 0xbfe3ff, alpha: 0.3 });
+    streak.blendMode = 'add';
+    streak.eventMode = 'none';
+    streak.position.set(x, y);
+    // ambienceLayer, not fxLayer: the star must shine above the night overlay.
+    // updateParticles' fxLayer.removeChild is a no-op here; destroy() detaches.
+    this.ambienceLayer.addChild(streak);
+    this.particles.push({ g: streak, vx, vy, life, maxLife: life, gravity: 0 });
   }
 
   /** Apply the current clock (or ?hour= override) to overlay tint and window lights. */
@@ -758,6 +840,7 @@ export class GameView {
     if (!this.duskOverlay) return;
     const enabled = useSettings.getState().dayNight;
     const d = enabled ? daylightAt(this.hourOverride ?? localHour()) : { tint: DAY_TINT, lights: 0 };
+    this.nightLevel = d.lights;
     this.duskOverlay.tint = d.tint;
     this.duskOverlay.visible = d.tint !== DAY_TINT;
     const lit = d.lights > 0.01;
