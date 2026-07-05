@@ -25,6 +25,7 @@ import { worldLayerTransform, worldToViewport, flipTextNodes } from './flip';
 import { useSettings, type Lang } from '../settings';
 import { contextPct } from '../context-progress';
 import { daylightAt, localHour, parseHourOverride, DAY_TINT } from './daylight';
+import { getWindowLightTexture } from './building-lights';
 
 /** Target decoration width in tiles (for sprite scaling). */
 const DECO_W: Record<DecoKind, number> = { tree: 1.1, rock: 0.8, bush: 0.75, flower: 0.7 };
@@ -106,7 +107,7 @@ export class GameView {
   private lastClearedAt = new Map<string, number>();
   private elapsed = 0;
   private duskOverlay?: Graphics;
-  private buildingLights: { g: Graphics; phase: number }[] = [];
+  private buildingLights: { node: Sprite | Graphics; phase: number; base: number }[] = [];
   private hourOverride?: number; // ?hour= URL param (testing/screenshots)
   private missionStatus = new Map<string, string>();
   private graph: WaypointGraph;
@@ -701,9 +702,10 @@ export class GameView {
 
   /**
    * Day/night scenery: a multiply-tinted overlay across the whole world (its
-   * tint follows the local clock via daylightAt) plus a warm "lit windows"
-   * glow per building that only shows after dusk. The glow layer sits ABOVE
-   * the overlay so lights punch through the night instead of being dimmed.
+   * tint follows the local clock via daylightAt) plus "lit from the inside"
+   * buildings after dusk — each building's own window pixels (extracted in
+   * building-lights.ts) rendered additively ABOVE the overlay, pixel-aligned
+   * with the sprite, and a faint light spill on the ground at the door.
    */
   private buildDaylight(rect: { minX: number; minY: number; maxX: number; maxY: number }): void {
     this.hourOverride = parseHourOverride(window.location.search);
@@ -716,21 +718,42 @@ export class GameView {
     this.worldLayer.addChild(overlay);
     this.duskOverlay = overlay;
 
+    const mode = this.theme.id === 'scifi' ? 'cool' : 'warm';
+    const spillColor = this.theme.id === 'scifi' ? 0x86d9ff : 0xffb45e;
     for (const b of this.theme.buildings) {
-      const anchor = this.windowAnchor(b);
-      const glow = new Graphics();
-      const r = this.theme.tile * 0.55;
-      for (const k of [1, 0.6, 0.32]) glow.circle(0, 0, r * k).fill({ color: 0xffb45e, alpha: 0.34 });
-      glow.blendMode = 'add';
-      glow.eventMode = 'none';
-      glow.position.set(anchor.x, anchor.y);
-      glow.alpha = 0;
-      this.worldLayer.addChild(glow);
-      this.buildingLights.push({ g: glow, phase: b.gx * 3.1 + b.gy * 1.7 });
+      const phase = b.gx * 3.1 + b.gy * 1.7;
+      const tex = getBuildingSprite(b.id);
+      const light = tex ? getWindowLightTexture(`${this.theme.id}/${b.id}`, tex, mode) : null;
+      if (!tex || !light) continue; // no readable windows: the building stays dark
+
+      // Window emission: same anchor + scale as the building sprite itself.
+      const foot = this.theme.projection.toScreen(b.gx + b.w / 2, b.gy + b.h);
+      const windows = new Sprite(light.texture);
+      windows.anchor.set(0.5, 1);
+      windows.scale.set((b.w * this.theme.tile) / tex.width);
+      windows.position.set(foot.x, foot.y);
+      windows.blendMode = 'add';
+      windows.eventMode = 'none';
+      windows.alpha = 0;
+      this.worldLayer.addChild(windows);
+      this.buildingLights.push({ node: windows, phase, base: light.intensity });
+
+      // Light spilling out the door onto the ground.
+      const door = this.theme.projection.toScreen(b.door.gx, b.door.gy);
+      const spill = new Graphics();
+      const r = this.theme.tile * 0.8;
+      spill.ellipse(0, 0, r, r * 0.45).fill({ color: spillColor, alpha: 0.5 });
+      spill.ellipse(0, 0, r * 0.55, r * 0.25).fill({ color: spillColor, alpha: 0.5 });
+      spill.blendMode = 'add';
+      spill.eventMode = 'none';
+      spill.position.set(door.x, door.y);
+      spill.alpha = 0;
+      this.worldLayer.addChild(spill);
+      this.buildingLights.push({ node: spill, phase, base: 0.22 });
     }
   }
 
-  /** Apply the current clock (or ?hour= override) to overlay tint and window glows. */
+  /** Apply the current clock (or ?hour= override) to overlay tint and window lights. */
   private updateDaylight(): void {
     if (!this.duskOverlay) return;
     const enabled = useSettings.getState().dayNight;
@@ -739,20 +762,12 @@ export class GameView {
     this.duskOverlay.visible = d.tint !== DAY_TINT;
     const lit = d.lights > 0.01;
     for (const light of this.buildingLights) {
-      light.g.visible = lit;
+      light.node.visible = lit;
       if (!lit) continue;
-      // Slow candle-like flicker, desynchronized per building.
-      const flicker = 0.82 + 0.18 * Math.sin(this.elapsed * 2.3 + light.phase);
-      light.g.alpha = d.lights * flicker;
+      // Gentle lamplight breathing, desynchronized per building.
+      const flicker = 0.93 + 0.07 * Math.sin(this.elapsed * 1.8 + light.phase);
+      light.node.alpha = d.lights * light.base * flicker;
     }
-  }
-
-  /** Anchor for the "lit windows" night glow: mid-height of the building solid. */
-  private windowAnchor(b: BuildingDef): { x: number; y: number } {
-    const foot = this.theme.projection.toScreen(b.gx + b.w / 2, b.gy + b.h);
-    const tex = getBuildingSprite(b.id);
-    const hgt = tex ? tex.height * ((b.w * this.theme.tile) / tex.width) : this.theme.tile * (b.h + 1);
-    return { x: foot.x, y: foot.y - hgt * 0.42 };
   }
 
   /** FX anchor point near the building sprite top (from texture dimensions). */
