@@ -4,14 +4,15 @@ dist/
 .DS_Store
 .superpowers/
 .playwright-mcp/
+.playwright-cli/
 
-# Surowe paczki pobierane offline (npm run assets) trafiają do downloads/.
+# Surowe paczki pobierane offline (pnpm run assets) trafiają do downloads/.
 # Do repo commitujemy WYŁĄCZNIE własne atlasy PixelLab z public/assets/.
 downloads/
 
 # Defense-in-depth: katalogi-cele opcjonalnych paczek zewnętrznych. Część z nich
 # (Tiny Swords, CraftPix) zakazuje redystrybucji — nigdy nie mogą trafić do repo,
-# nawet gdyby ktoś uruchomił `npm run assets` i zrobił `git add .`.
+# nawet gdyby ktoś uruchomił `pnpm run assets` i zrobił `git add .`.
 packages/client/public/assets/*/tiny-swords/
 packages/client/public/assets/*/craftpix-drones/
 packages/client/public/assets/*/lucifer-sorceress/

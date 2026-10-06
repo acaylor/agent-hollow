@@ -1,5 +1,5 @@
 // Builds the full offline autotiled map (like buildTilemap in the engine) into PNG.
-// Run: npx tsx scripts/preview-tilemap.ts
+// Run: pnpm exec tsx scripts/preview-tilemap.ts
 import { PNG } from 'pngjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';

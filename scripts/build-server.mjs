@@ -11,7 +11,7 @@ await build({
   bundle: true,
   platform: 'node',
   format: 'esm',
-  target: 'node22',
+  target: 'node24',
   // Shebang for the `bin` file; cli.ts has no own shebang to avoid duplication.
   banner: { js: '#!/usr/bin/env node' },
   // Dependencies with native/dynamic require stay in the consumer's node_modules.
