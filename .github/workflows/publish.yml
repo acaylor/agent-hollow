@@ -5,9 +5,9 @@ name: Publish to npm
 # npmjs.com must list this repo + workflow as the package's Trusted Publisher
 # (package → Settings → Trusted Publisher: acaylor/agent-hollow, publish.yml).
 #
-# Requirements: GitHub-hosted runner, `id-token: write`, npm >= 11.5.1
-# Node 24.21.0 includes a compatible npm. Provenance attestation is generated
-# automatically with trusted publishing.
+# Requirements: GitHub-hosted runner, `id-token: write`, and pnpm 12.9.1
+# (pinned in package.json). pnpm uses OIDC for trusted publishing and generates
+# provenance for the published package.
 #
 # Release flow: bump package.json in a PR, then tag its merged commit.
 #   git switch main && git pull --ff-only origin main
@@ -45,4 +45,5 @@ jobs:
           NODE
       - run: pnpm install --frozen-lockfile
       # prepublishOnly in package.json runs the build + full test suite first.
-      - run: npm publish
+      # Tag checkouts have detached HEAD; the release tag is validated above.
+      - run: pnpm publish --no-git-checks --provenance --access public
