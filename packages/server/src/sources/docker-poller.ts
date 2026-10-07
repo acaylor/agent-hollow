@@ -73,7 +73,7 @@ export class DockerPoller {
   async start(): Promise<void> {
     if (this.running) return;
     if (process.env.HOLLOW_DOCKER === '0') {
-      console.log('[Docker] Poller wyłączony (HOLLOW_DOCKER=0)');
+      console.log('[Docker] Poller disabled (HOLLOW_DOCKER=0)');
       return;
     }
     this.running = true;
@@ -82,7 +82,7 @@ export class DockerPoller {
       console.log('[Docker] Poller started');
     } else {
       if (!this.running) return;
-      console.log('[Docker] docker niedostępny — poller czeka (uruchom Docker, by zobaczyć kontenery)');
+      console.log('[Docker] docker unavailable — poller waiting (start Docker to see containers)');
     }
     this.timer = setInterval(() => void this.poll(), this.intervalMs);
     await this.poll();
@@ -119,7 +119,7 @@ export class DockerPoller {
     } catch (err) {
       // Daemon padł / docker zniknął z PATH — loguj raz, pętla sama się podniesie.
       if (!this.loggedUnavailable) {
-        console.warn('[Docker] ps nieosiągalny:', err instanceof Error ? err.message : String(err));
+        console.warn('[Docker] ps unreachable:', err instanceof Error ? err.message : String(err));
         this.loggedUnavailable = true;
       }
       return;
@@ -157,7 +157,7 @@ export class DockerPoller {
     const r = await this.client.exec(entry.info.id, ['sh', '-c', PROBE_CMD], { timeoutMs: EXEC_TIMEOUT_MS });
     if (r.code !== 0) {
       entry.status = 'unreadable';
-      console.warn(`[Docker] kontener ${entry.info.name} nieczytelny (brak sh/uprawnień?) — pomijam`);
+      console.warn(`[Docker] container ${entry.info.name} unreadable (no sh/permissions?) — skipping`);
       return;
     }
     entry.status = r.stdout.trim().length > 0 ? 'agentic' : 'non-agentic';

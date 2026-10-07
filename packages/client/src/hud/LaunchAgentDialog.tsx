@@ -71,7 +71,7 @@ export function LaunchAgentDialog({ onClose }: { onClose: () => void }) {
           <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={4} style={{ width: '100%' }} />
         </label>
         <label style={{ fontSize: 12 }}>{t.launchModel}
-          <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="claude-opus-4-8" style={{ width: '100%' }} />
+          <input value={model} onChange={(e) => setModel(e.target.value)} placeholder="claude-opus-5-5" style={{ width: '100%' }} />
         </label>
         <label style={{ fontSize: 12 }}>{t.launchPermissionMode}
           <select value={mode} onChange={(e) => setMode(e.target.value as SdkPermissionMode)} style={{ width: '100%' }}>

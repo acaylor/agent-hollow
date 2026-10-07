@@ -39,8 +39,11 @@ export async function loadThemeSprites(themeId: string): Promise<void> {
   for (const key of index.keys) {
     try {
       // Alias includes themeId to prevent cross-theme cache collisions in Pixi 8.
+      // Frame names repeat across themes too (e.g. "familiar-default__walk_01"), and Pixi
+      // caches every frame globally: without a prefix each theme switch logs
+      // "[Cache] already has key" for every frame.
       const alias = `${themeId}/${key}`;
-      const sheet = await Assets.load<Spritesheet>({ alias, src: `${base}/${key}.json` });
+      const sheet = await Assets.load<Spritesheet>({ alias, src: `${base}/${key}.json`, data: { cachePrefix: `${alias}/` } });
       if (sheet) {
         heroSheets.set(key, sheet);
         console.log(`[heroes]   ✓ ${key} loaded: ${Object.keys(sheet.animations).join(',')}`);
