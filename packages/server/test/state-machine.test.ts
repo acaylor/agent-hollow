@@ -181,7 +181,39 @@ describe('SessionTracker', () => {
     const hero = world.getHero('session-cwd');
     expect(hero?.workingDir).toBe('/Users/mpawelczuk/RTS agents'); // full path
     expect(hero?.projectName).toBe('RTS agents'); // basename for HUD
-    expect(hero?.projectDir).toBe('-Users-mpawelczuk-RTS-agents'); // city key unchanged
+    expect(hero?.projectDir).toBe('/Users/mpawelczuk/RTS agents'); // city key = real cwd
+  });
+
+  it('Claude and Codex sessions in the same folder share one city key', () => {
+    const world = new World();
+    const claude = new SessionTracker(world, 'claude-1', '-tmp-e2e-realm');
+    const codex = new SessionTracker(world, 'codex-1', '', DEFAULT_THRESHOLDS, 'codex');
+    const hook = new SessionTracker(world, 'claude-2', 'e2e-realm'); // hooks key by basename
+    for (const t of [claude, codex, hook]) t.apply({ kind: 'meta', cwd: '/tmp/e2e-realm' });
+
+    expect(new Set(['claude-1', 'codex-1', 'claude-2'].map((id) => world.getHero(id)?.projectDir))).toEqual(
+      new Set(['/tmp/e2e-realm']),
+    );
+  });
+
+  it('city key is pinned to the first cwd; later cwd changes only move workingDir', () => {
+    const world = new World();
+    const tracker = new SessionTracker(world, 'codex-cd', '', DEFAULT_THRESHOLDS, 'codex');
+    tracker.apply({ kind: 'meta', cwd: '/repo' });
+    tracker.apply({ kind: 'meta', cwd: '/repo/packages/server' });
+
+    const hero = world.getHero('codex-cd');
+    expect(hero?.projectDir).toBe('/repo');
+    expect(hero?.projectName).toBe('repo');
+    expect(hero?.workingDir).toBe('/repo/packages/server');
+  });
+
+  it('scoped source keys (docker://) are not replaced by the container cwd', () => {
+    const world = new World();
+    const tracker = new SessionTracker(world, 'docker:abc:s1', 'docker://devbox');
+    tracker.apply({ kind: 'meta', cwd: '/workspace' });
+
+    expect(world.getHero('docker:abc:s1')?.projectDir).toBe('docker://devbox');
   });
 
   it('meta backfills projectDir from cwd when the source cannot classify a project key', () => {
