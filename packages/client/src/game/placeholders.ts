@@ -6,7 +6,7 @@ import { themeRoadCurves, type RoadPoint } from './roads';
 
 /**
  * Programmatic pixel-art-style placeholders; the game works and looks coherent
- * before the user downloads asset packs (`npm run assets`). Once assets are
+ * before the user downloads asset packs (`pnpm run assets`). Once assets are
  * installed, these factories are replaced by spritesheets.
  */
 

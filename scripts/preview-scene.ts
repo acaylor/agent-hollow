@@ -1,5 +1,5 @@
 // Builds a full offline scene (terrain autotiling + buildings) into PNG, like the engine.
-// Run: npx tsx scripts/preview-scene.ts
+// Run: pnpm exec tsx scripts/preview-scene.ts
 import { PNG } from 'pngjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';

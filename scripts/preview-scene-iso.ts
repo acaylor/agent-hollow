@@ -1,6 +1,6 @@
 // Offline ISOMETRIC scene composite for the selected theme -> PNG.
 // Replicates engine placement (buildIsoTilemap + buildBuildingSprite + scatter).
-// Run: npx tsx scripts/preview-scene-iso.ts [fantasy|scifi]
+// Run: pnpm exec tsx scripts/preview-scene-iso.ts [fantasy|scifi]
 import { PNG } from 'pngjs';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';

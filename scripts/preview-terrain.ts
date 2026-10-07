@@ -1,5 +1,5 @@
 // Preview the logical biome map as PNG (offline, no browser).
-// Run: npx tsx scripts/preview-terrain.ts
+// Run: pnpm exec tsx scripts/preview-terrain.ts
 import { PNG } from 'pngjs';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { buildTerrainMap, type TerrainId } from '../packages/client/src/game/terrain-map.ts';

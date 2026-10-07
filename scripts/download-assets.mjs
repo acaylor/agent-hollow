@@ -6,7 +6,7 @@
  * pack page), so the flow is:
  *   1. Download the zip from the pack page (the "page" field in assets-manifest.json).
  *   2. Save it as downloads/<id>.zip.
- *   3. Run `npm run assets`; the script unpacks everything it finds into
+ *   3. Run `pnpm run assets`; the script unpacks everything it finds into
  *      packages/client/public/assets/<target> and lists what is missing.
  */
 import { execFileSync } from 'node:child_process';
@@ -51,7 +51,7 @@ if (missing.length > 0) {
     console.log(`    save:  downloads/${pack.id}.zip`);
     console.log(`    role:  ${pack.role}`);
   }
-  console.log('\nThen run again: npm run assets');
+  console.log('\nThen run again: pnpm run assets');
 } else {
   console.log(`\nComplete: ${installed}/${manifest.packs.length} packs installed.`);
 }
