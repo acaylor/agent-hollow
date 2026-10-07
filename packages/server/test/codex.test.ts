@@ -263,6 +263,50 @@ describe('interpretCodexLine', () => {
     });
   });
 
+  it('code-mode exec snippets unwrap to the tool they actually call', () => {
+    const exec = (input: string) =>
+      interpretCodexLine(line({
+        type: 'response_item',
+        timestamp: '2026-10-07T13:34:40.000Z',
+        payload: { type: 'custom_tool_call', name: 'exec', call_id: 'call-exec', input },
+      })).find((f) => f.kind === 'tool-start');
+
+    expect(exec('text(await tools.apply_patch("*** Begin Patch\\n*** Add File: /tmp/e2e/NOTES.md\\n+hi\\n*** End Patch\\n"));\n'))
+      .toMatchObject({ tool: 'Edit', detail: 'NOTES.md', messageId: 'call-exec' });
+    expect(exec('const r = await tools.exec_command({"cmd":"git status --short","workdir":"/x"}); text(r.output);'))
+      .toMatchObject({ tool: 'Bash', detail: 'git status --short' });
+    expect(exec('text(await tools.exec_command({cmd:"cat math.js",max_output_tokens:3000}));'))
+      .toMatchObject({ tool: 'Bash', detail: 'cat math.js' });
+    expect(exec('const r = await tools.web__run({"search_query":[{"q":"pixijs cache warning"}]}); text(r);'))
+      .toMatchObject({ tool: 'WebSearch', detail: 'pixijs cache warning' });
+    expect(exec('const r = await tools.web__run({"open":[{"ref_id":"turn0search2"}]}); text(r);'))
+      .toMatchObject({ tool: 'WebSearch', detail: undefined });
+    expect(exec('text(await tools.view_image({"path":"/tmp/shot.png"}));'))
+      .toMatchObject({ tool: 'Read', detail: '/tmp/shot.png' });
+    expect(exec('const r = await tools.mcp__codex_apps__github_fetch_file({"path":".github/workflows/ci.yml"});'))
+      .toMatchObject({ tool: 'mcp__codex_apps__github_fetch_file', detail: '.github/workflows/ci.yml' });
+  });
+
+  it('code-mode exec prefers an edit over other calls in the same snippet', () => {
+    const facts = interpretCodexLine(line({
+      type: 'response_item',
+      payload: {
+        type: 'custom_tool_call',
+        name: 'exec',
+        input: 'await tools.exec_command({cmd:"ls"}); const patch = "*** Begin Patch\\n*** Update File: src/a.ts\\n"; await tools.apply_patch(patch);',
+      },
+    }));
+    expect(facts.find((f) => f.kind === 'tool-start')).toMatchObject({ tool: 'Edit', detail: 'a.ts' });
+  });
+
+  it('code-mode exec without tool calls keeps the legacy exec mapping', () => {
+    const facts = interpretCodexLine(line({
+      type: 'response_item',
+      payload: { type: 'custom_tool_call', name: 'exec', input: 'text(ALL_TOOLS.length)' },
+    }));
+    expect(facts.find((f) => f.kind === 'tool-start')).toMatchObject({ tool: 'Bash' });
+  });
+
   it('Codex token_count preserves cumulative totals and current context usage', () => {
     expect(interpretCodexLine(line({
       type: 'event_msg',

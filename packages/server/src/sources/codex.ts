@@ -153,6 +153,71 @@ function codexToolDetail(name: string, argumentsRaw: unknown): string | undefine
   return str(args.path) ?? str(args.file_path) ?? str(args.query);
 }
 
+/* ─────────────────────────────────────────────────────────────────
+ * Codex "code mode": newer CLIs wrap every tool call in a single custom
+ * tool named `exec` whose input is a JS snippet, e.g.
+ *   text(await tools.apply_patch("*** Begin Patch\n*** Add File: a.md…"))
+ *   const r = await tools.exec_command({"cmd":"ls","workdir":"/x"})
+ * Without unwrapping, every action lands in the mine with raw JS as detail.
+ * ───────────────────────────────────────────────────────────────── */
+const CODE_MODE_CALL = /\btools\.([A-Za-z_]\w*)\s*\(/g;
+
+/** Inner code-mode name -> Codex tool name ('web__run' -> 'web.run'; MCP names unchanged). */
+function codeModeToolName(name: string): string {
+  if (name.startsWith('mcp__')) return name;
+  const i = name.indexOf('__');
+  return i > 0 ? `${name.slice(0, i)}.${name.slice(i + 2)}` : name;
+}
+
+/** First JS string literal assigned to `key` (`key:"…"` or `"key":"…"`), decoded. */
+function jsStringField(code: string, key: string): string | undefined {
+  const m = code.match(new RegExp(`["']?\\b${key}["']?\\s*:\\s*("(?:[^"\\\\]|\\\\.)*"|'(?:[^'\\\\]|\\\\.)*')`));
+  if (!m) return undefined;
+  const lit = m[1];
+  try {
+    return lit.startsWith('"') ? JSON.parse(lit) : JSON.parse(`"${lit.slice(1, -1).replace(/\\'/g, "'").replace(/"/g, '\\"')}"`);
+  } catch {
+    return lit.slice(1, -1);
+  }
+}
+
+/** Detail for an unwrapped code-mode call, read from the whole snippet. */
+function codeModeDetail(name: string, code: string): string | undefined {
+  switch (name) {
+    case 'exec_command': {
+      const cmd = jsStringField(code, 'cmd');
+      return cmd ? clip(cmd.replace(/^bash\s+-lc\s+/, ''), 60) : undefined;
+    }
+    case 'apply_patch': {
+      // The patch is a JS string literal, so its newlines are usually escaped.
+      const m = code.match(/\*\*\* (?:Update|Add|Delete) File: (.+?)(?:\\n|\n|"|$)/);
+      return m ? m[1].split('/').pop() : undefined;
+    }
+    case 'web.run': {
+      // ref_id is a URL when opening a page, an opaque 'turn0search2' handle otherwise.
+      const ref = jsStringField(code, 'ref_id');
+      return jsStringField(code, 'q') ?? (ref && /^https?:\/\//.test(ref) ? ref : undefined);
+    }
+    case 'update_plan':
+      return jsStringField(code, 'step');
+    default:
+      return jsStringField(code, 'path') ?? jsStringField(code, 'query');
+  }
+}
+
+/**
+ * Unwraps a code-mode `exec` snippet into the tool it actually runs. A snippet
+ * can call several tools (Promise.allSettled); an edit wins since it is the
+ * most meaningful signal, otherwise the first call does. Returns undefined
+ * when the snippet calls no tools (plain JS).
+ */
+export function unwrapCodexCodeMode(code: string): { tool: string; detail?: string } | undefined {
+  const names = [...code.matchAll(CODE_MODE_CALL)].map((m) => codeModeToolName(m[1]));
+  if (names.length === 0) return undefined;
+  const name = names.includes('apply_patch') ? 'apply_patch' : names[0];
+  return { tool: codexToolToCanonical(name), detail: codeModeDetail(name, code) };
+}
+
 /** Whether function_call result indicates an error (best-effort; formats differ). */
 function codexOutputIsError(output: unknown): boolean {
   if (output && typeof output === 'object') {
@@ -316,10 +381,12 @@ export function interpretCodexLine(line: string): Fact[] {
           const name = str(payload.name);
           if (name) {
             const rawName = codexQualifiedToolName(name, str(payload.namespace));
+            const input = payload.arguments ?? payload.input;
+            const codeMode = rawName === 'exec' && typeof input === 'string' ? unwrapCodexCodeMode(input) : undefined;
             facts.push({
               kind: 'tool-start',
-              tool: codexToolToCanonical(name, str(payload.namespace)),
-              detail: codexToolDetail(rawName, payload.arguments ?? payload.input),
+              tool: codeMode?.tool ?? codexToolToCanonical(name, str(payload.namespace)),
+              detail: codeMode ? codeMode.detail : codexToolDetail(rawName, input),
               messageId: str(payload.call_id) ?? `codex-${ts}`,
               ts,
             });
