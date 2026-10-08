@@ -38,7 +38,7 @@ export interface HeroSnapshot {
    *  `projectDir`, which is an encoded folder name for Claude sources (~/.claude/projects/<enc>).
    *  ArsenalPoller reads config from this field, not projectDir. */
   workingDir?: string;
-  /** Readable project name (cwd basename, e.g. "RTS agents") for the HUD. */
+  /** Readable project name (cwd basename, e.g. "my-project") for the HUD. */
   projectName?: string;
   model?: string;
   gitBranch?: string;
