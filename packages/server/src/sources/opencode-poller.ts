@@ -34,10 +34,13 @@ const DB_RETRY_INITIAL_MS = 5_000;
 const DB_RETRY_MAX_MS = 5 * 60_000;
 
 /** better-sqlite3 cannot open the file — it (or its directory) does not exist.
- * SQLITE_CANTOPEN is what a readonly open of a missing file throws. */
+ * SQLITE_CANTOPEN is what a readonly open of a missing file throws; a missing
+ * parent directory (OpenCode never run) is checked in JS first and throws a
+ * plain TypeError with no code. */
 function isDbMissingError(err: unknown): boolean {
   const code = (err as { code?: string } | null)?.code;
-  return code === 'SQLITE_CANTOPEN' || code === 'ENOENT';
+  if (code === 'SQLITE_CANTOPEN' || code === 'ENOENT') return true;
+  return err instanceof TypeError && /directory does not exist/i.test(err.message);
 }
 
 function isSchemaMismatchError(err: unknown): boolean {

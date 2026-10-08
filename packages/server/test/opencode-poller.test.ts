@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { homedir } from 'node:os';
+import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { World } from '../src/world.js';
 import { getOpencodeDbPath } from '../src/sources/opencode.js';
@@ -99,6 +99,29 @@ describe('OpenCodePoller', () => {
 
     await poller.stop();
     vi.useRealTimers();
+  });
+
+  it('waits (instead of disabling itself) when the OpenCode data directory does not exist', async () => {
+    // Real better-sqlite3: a missing parent directory throws a code-less TypeError.
+    const hasSqlite = await import('better-sqlite3').then(() => true, () => false);
+    if (!hasSqlite) return;
+    vi.useFakeTimers();
+    process.env.XDG_DATA_HOME = join(tmpdir(), `hollow-no-opencode-${process.pid}-${Date.now()}`);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const { OpenCodePoller } = await import('../src/sources/opencode-poller.js');
+    const poller = new OpenCodePoller({} as World);
+    try {
+      await poller.start();
+      expect(warn).not.toHaveBeenCalled();
+      expect(log.mock.calls.filter(([m]) => String(m).includes('Database not found'))).toHaveLength(1);
+      expect(vi.getTimerCount()).toBe(1); // retry scheduled
+    } finally {
+      await poller.stop();
+      delete process.env.XDG_DATA_HOME;
+      vi.useRealTimers();
+    }
   });
 
   it('stops retrying once stop() is called while waiting for the database', async () => {
