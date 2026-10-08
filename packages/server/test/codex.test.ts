@@ -299,6 +299,19 @@ describe('interpretCodexLine', () => {
     expect(facts.find((f) => f.kind === 'tool-start')).toMatchObject({ tool: 'Edit', detail: 'a.ts' });
   });
 
+  it('code-mode exec ignores tool names inside strings and comments', () => {
+    const exec = (input: string) =>
+      interpretCodexLine(line({ type: 'response_item', payload: { type: 'custom_tool_call', name: 'exec', input } }))
+        .find((f) => f.kind === 'tool-start');
+
+    expect(exec(`await tools.exec_command({cmd: "rg 'tools.apply_patch(' src"});`))
+      .toMatchObject({ tool: 'Bash', detail: "rg 'tools.apply_patch(' src" });
+    expect(exec('// later: tools.apply_patch(\nawait tools.exec_command({cmd:"ls"});'))
+      .toMatchObject({ tool: 'Bash', detail: 'ls' });
+    expect(exec('/* tools.apply_patch( */ await tools.exec_command({cmd:`echo "tools.apply_patch("`});'))
+      .toMatchObject({ tool: 'Bash' });
+  });
+
   it('code-mode exec without tool calls keeps the legacy exec mapping', () => {
     const facts = interpretCodexLine(line({
       type: 'response_item',

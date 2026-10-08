@@ -206,13 +206,45 @@ function codeModeDetail(name: string, code: string): string | undefined {
 }
 
 /**
+ * Blanks string literals and comments so text that merely mentions a tool
+ * (`rg 'tools.apply_patch(' src`) is not taken for a call. Template literals are
+ * blanked whole, `${…}` included. Regex literals are not recognized (rare here).
+ */
+function stripJsLiterals(code: string): string {
+  let out = '';
+  for (let i = 0; i < code.length; ) {
+    const c = code[i];
+    if (c === '"' || c === "'" || c === '`') {
+      let j = i + 1;
+      while (j < code.length && code[j] !== c) j += code[j] === '\\' ? 2 : 1;
+      out += ' '.repeat(Math.min(j + 1, code.length) - i);
+      i = j + 1;
+    } else if (c === '/' && code[i + 1] === '/') {
+      const end = code.indexOf('\n', i);
+      const j = end === -1 ? code.length : end;
+      out += ' '.repeat(j - i);
+      i = j;
+    } else if (c === '/' && code[i + 1] === '*') {
+      const end = code.indexOf('*/', i + 2);
+      const j = end === -1 ? code.length : end + 2;
+      out += ' '.repeat(j - i);
+      i = j;
+    } else {
+      out += c;
+      i++;
+    }
+  }
+  return out;
+}
+
+/**
  * Unwraps a code-mode `exec` snippet into the tool it actually runs. A snippet
  * can call several tools (Promise.allSettled); an edit wins since it is the
  * most meaningful signal, otherwise the first call does. Returns undefined
  * when the snippet calls no tools (plain JS).
  */
 export function unwrapCodexCodeMode(code: string): { tool: string; detail?: string } | undefined {
-  const names = [...code.matchAll(CODE_MODE_CALL)].map((m) => codeModeToolName(m[1]));
+  const names = [...stripJsLiterals(code).matchAll(CODE_MODE_CALL)].map((m) => codeModeToolName(m[1]));
   if (names.length === 0) return undefined;
   const name = names.includes('apply_patch') ? 'apply_patch' : names[0];
   return { tool: codexToolToCanonical(name), detail: codeModeDetail(name, code) };
