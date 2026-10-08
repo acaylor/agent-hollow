@@ -55,6 +55,10 @@ export class SessionTracker {
   private firstSubstantialPrompt?: string; // pierwszy SENSOWNY prompt (nie "ok"/"dawaj") — stabilna nazwa
   private projectName?: string; // basename cwd, np. "RTS agents"
   private workingDir?: string; // full cwd from transcript: real path to arsenal config
+  // City key: the session's FIRST cwd, so every agent kind in one folder shares a city
+  // (Claude's encoded folder name, hook basenames and Codex's cwd used to diverge).
+  // Pinned once so a `cd` into a subfolder does not move the hero to another city.
+  private cityDir?: string;
   private recentActions: ActionEntry[] = []; // recent tools, newest first (activity axis in panel)
   private wieldedSkills = new Set<string>();
   private wieldedConnectors = new Set<string>();
@@ -154,11 +158,14 @@ export class SessionTracker {
 
       case 'meta':
         if (fact.cwd) {
-          this.projectName = basename(fact.cwd);
           this.workingDir = fact.cwd;
+          // Scoped source keys (e.g. docker://devbox) stay authoritative: container cwds collide.
+          if (!this.cityDir && !this.projectDir.includes('://')) this.cityDir = fact.cwd;
+          // The city name follows the pinned key, not every `cd`.
+          this.projectName = basename(this.cityDir ?? fact.cwd);
         }
         this.patch({
-          ...(!this.projectDir && this.workingDir ? { projectDir: this.workingDir } : {}),
+          ...(this.cityDir ? { projectDir: this.cityDir } : {}),
           ...(this.projectName ? { projectName: this.projectName, title: this.displayTitle() } : {}),
           ...(this.workingDir ? { workingDir: this.workingDir } : {}),
           ...(fact.model ? { model: fact.model } : {}),

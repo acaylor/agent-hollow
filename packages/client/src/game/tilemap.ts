@@ -22,7 +22,9 @@ export async function loadTilemaps(themeId: string): Promise<void> {
     tilePx = idx.tile ?? 32;
     for (const pair of idx.pairs as string[]) {
       try {
-        sheets.set(pair, await Assets.load<Spritesheet>(`/assets/${themeId}/tilemap/${pair}.json`));
+        const src = `/assets/${themeId}/tilemap/${pair}.json`;
+        // Prefix frame cache keys per theme (see loadThemeSprites in sprites.ts).
+        sheets.set(pair, await Assets.load<Spritesheet>({ src, data: { cachePrefix: `${themeId}/tilemap/${pair}/` } }));
       } catch {
         /* single missing pair: skip it */
       }
