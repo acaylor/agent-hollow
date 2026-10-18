@@ -173,15 +173,15 @@ describe('SessionTracker', () => {
   });
 
   it('meta stores full workingDir (cwd) alongside projectName=basename', () => {
-    // Regression: for the Claude source, projectDir is the encoded folder name, NOT a path.
+    // Regression: the Claude source starts from the encoded folder name; meta must replace it with the real path.
     // ArsenalPoller reads config from workingDir, so cwd must reach the snapshot in full.
     const world = new World();
-    const tracker = new SessionTracker(world, 'session-cwd', '-Users-mpawelczuk-RTS-agents');
-    tracker.apply({ kind: 'meta', cwd: '/Users/mpawelczuk/RTS agents' });
+    const tracker = new SessionTracker(world, 'session-cwd', '-Users-x-My-Project');
+    tracker.apply({ kind: 'meta', cwd: '/Users/x/My Project' });
     const hero = world.getHero('session-cwd');
-    expect(hero?.workingDir).toBe('/Users/mpawelczuk/RTS agents'); // full path
-    expect(hero?.projectName).toBe('RTS agents'); // basename for HUD
-    expect(hero?.projectDir).toBe('/Users/mpawelczuk/RTS agents'); // city key = real cwd
+    expect(hero?.workingDir).toBe('/Users/x/My Project'); // full path
+    expect(hero?.projectName).toBe('My Project'); // basename for HUD
+    expect(hero?.projectDir).toBe('/Users/x/My Project'); // city key = real cwd
   });
 
   it('Claude and Codex sessions in the same folder share one city key', () => {
@@ -220,11 +220,11 @@ describe('SessionTracker', () => {
     const world = new World();
     const tracker = new SessionTracker(world, 'session-codex', '', DEFAULT_THRESHOLDS, 'codex');
 
-    tracker.apply({ kind: 'meta', cwd: '/Users/aj/sourcecode/open-source/misc/agent-hollow' });
+    tracker.apply({ kind: 'meta', cwd: '/Users/x/agent-hollow' });
 
     const hero = world.getHero('session-codex');
-    expect(hero?.projectDir).toBe('/Users/aj/sourcecode/open-source/misc/agent-hollow');
-    expect(hero?.workingDir).toBe('/Users/aj/sourcecode/open-source/misc/agent-hollow');
+    expect(hero?.projectDir).toBe('/Users/x/agent-hollow');
+    expect(hero?.workingDir).toBe('/Users/x/agent-hollow');
     expect(hero?.projectName).toBe('agent-hollow');
   });
 

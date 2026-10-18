@@ -227,7 +227,7 @@ describe('applyExternalFacts - /clear strike routing', () => {
   it('routes cleared to the existing hero in the same cwd, not the new session', () => {
     const world = new World();
     const watcher = new SourceWatcher(world, stubSource);
-    const cwd = '/home/lachlan/agent-hollow';
+    const cwd = '/home/u/agent-hollow';
 
     watcher.applyExternalFacts('old-session', 'agent-hollow', [{ kind: 'meta', cwd }]);
     watcher.applyExternalFacts(
@@ -249,7 +249,7 @@ describe('applyExternalFacts - /clear strike routing', () => {
     const watcher = new SourceWatcher(world, stubSource);
 
     watcher.applyExternalFacts('solo-session', 'agent-hollow', [
-      { kind: 'meta', cwd: '/home/lachlan/agent-hollow' },
+      { kind: 'meta', cwd: '/home/u/agent-hollow' },
       { kind: 'cleared', ts: new Date().toISOString() },
     ]);
 

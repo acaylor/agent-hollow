@@ -53,7 +53,7 @@ export class SessionTracker {
   // Hero-name candidates in descending priority (see displayTitle()).
   private explicitTitle?: string; // explicit CLI title (custom-title/ai-title), if Claude version records it
   private firstSubstantialPrompt?: string; // pierwszy SENSOWNY prompt (nie "ok"/"dawaj") — stabilna nazwa
-  private projectName?: string; // basename cwd, np. "RTS agents"
+  private projectName?: string; // basename of the city cwd, e.g. "my-project"
   private workingDir?: string; // full cwd from transcript: real path to arsenal config
   // City key: the session's FIRST cwd, so every agent kind in one folder shares a city
   // (Claude's encoded folder name, hook basenames and Codex's cwd used to diverge).
