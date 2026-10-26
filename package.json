@@ -32,7 +32,7 @@
     "pixel-art",
     "cli"
   ],
-  "packageManager": "pnpm@12.9.1",
+  "packageManager": "pnpm@12.15.0",
   "devEngines": {
     "runtime": {
       "name": "node",
